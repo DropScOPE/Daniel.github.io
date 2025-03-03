@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ----------------------------------------------------
   const codeSnippet = `{
   "Coding": ["Python", "HTML", "CSS", "JS", "C#"],
-  "Certifications": "Coming soon...",
+  "Certifications": "Coming soon",
   "Gaming": {
     "Rainbow Six": "Top 80, 5800 max elo",
     "Call of Duty": "Since CoD 4, currently top 100 ranked multiplayer"
