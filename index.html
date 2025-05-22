@@ -1,194 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Daniel's Digital Domain</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daniel's Digital Domain</title>
 
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Highlight.js (Dracula theme) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/dracula.min.css" />
-  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
     <link rel="icon" type="image/x-icon" href="images/Tab.ico">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/atom-one-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
 </head>
 <body>
-  <!-- ADVANCED LOADING SCREEN -->
-  <div id="loading-screen">
-    <div class="loader-container">
-      <div class="loader"></div>
-      <div class="loading-text">Loading...</div>
+    <div id="loading-screen" role="status" aria-live="polite" aria-atomic="true">
+        <div class="loader-container">
+            <div class="loader" aria-hidden="true"></div>
+            <div class="loading-text">
+                <span class="visually-hidden">Website is </span>Loading<span class="loading-dots">...</span>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- STARFIELD BACKGROUND CANVAS -->
-  <canvas id="starfield"></canvas>
+    <canvas id="starfield" aria-hidden="true"></canvas>
 
-  <!-- VINYL BACKGROUND MUSIC PLAYER (Fixed in top-right, offset from nav) -->
-  <div id="vinyl-player">
-    <img id="vinyl-image" src="images/Vynl.png" alt="Vinyl Player">
-    <audio id="background-audio" src="music/background.mp3" loop></audio>
-  </div>
+    <nav id="main-nav" aria-label="Main Website Navigation">
+        <div class="logo" aria-label="Daniel's Domain Logo">Daniel's Domain</div>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#accomplishments">Accomplishments</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#gaming">Gaming</a></li>
+        </ul>
+    </nav>
 
-  <!-- NAVIGATION -->
-  <nav id="main-nav">
-    <div class="logo">Daniel's Domain</div>
-    <ul>
-      <li><a href="#home">Home</a></li>
-      <li><a href="#accomplishments">Accomplishments</a></li>
-      <li><a href="#interests">Interests</a></li>
-      <li><a href="#gaming">Gaming</a></li>
-    </ul>
-  </nav>
+    <section id="home" class="section home-centered" role="region" aria-labelledby="home-heading">
+        <div class="content">
+            <h1 id="home-heading" data-text="Welcome to Daniel's Digital Domain"></h1>
+            <p data-text="Welcome, and have a great time! I am still working on this webpage. Have patience."></p>
+        </div>
+    </section>
 
-  <!-- HOME SECTION -->
-  <section id="home" class="section home-centered">
-    <div class="content">
-      <!-- Reimagined calm, dark, aesthetic welcome text with typewriter effect -->
-      <h1 data-text="Welcome to Daniel's Digital Domain"></h1>
-      <p data-text="Welcome, and have a great time! I am still working on this webpage. Have patience."></p>
-    </div>
-  </section>
+    <section id="accomplishments" class="section" role="region" aria-labelledby="accomplishments-heading">
+        <div class="content">
+            <h2 id="accomplishments-heading">Accomplishments</h2>
+            <p>My journey speaks volumes:</p>
+            <div class="timeline">
+                <div class="timeline-item fade-in" data-year="2020" id="accomplishment-2020" tabindex="0" role="button" aria-expanded="false" aria-controls="timeline-details">
+                    <div class="timeline-content">
+                        <h3>Certifications & Awards</h3>
+                        <p>Got my first certifications in programming which turned a point in my career.</p>
+                    </div>
+                </div>
+                <div class="timeline-item fade-in" data-year="2021" id="accomplishment-2021" tabindex="0" role="button" aria-expanded="false" aria-controls="timeline-details">
+                    <div class="timeline-content">
+                        <h3>First Faceit Tournament Win as IGL</h3>
+                        <p>Clinched my first tournament victory as an IGL in Rainbow Six while peaking in YouTube views—a major milestone.</p>
+                    </div>
+                </div>
+                <div class="timeline-item fade-in" data-year="2022" id="accomplishment-2022" tabindex="0" role="button" aria-expanded="false" aria-controls="timeline-details">
+                    <div class="timeline-content">
+                        <h3>Unfiltered Breakthrough</h3>
+                        <p>A challenging year filled with raw, transformative experiences that redefined my journey.</p>
+                    </p>
+                    </div>
+                </div>
+                <div class="timeline-item fade-in" data-year="2023" id="accomplishment-2023" tabindex="0" role="button" aria-expanded="false" aria-controls="timeline-details">
+                    <div class="timeline-content">
+                        <h3>Freelance Programmer</h3>
+                        <p>Started showing my skills to a small community, releasing open projects on GitHub and actively growing a Discord community.</p>
+                    </div>
+                </div>
+                <div class="timeline-item fade-in" data-year="2024" id="accomplishment-2024" tabindex="0" role="button" aria-expanded="false" aria-controls="timeline-details">
+                    <div class="timeline-content">
+                        <h3>Music Coming...</h3>
+                        <p>Ventured into music production—an exciting new chapter in creative expression is on the horizon.</p>
+                    </div>
+                </div>
+                <div class="timeline-item fade-in" data-year="2025" id="accomplishment-2025" tabindex="0" role="button" aria-expanded="false" aria-controls="timeline-details">
+                    <div class="timeline-content">
+                        <h3>The Future Awaits</h3>
+                        <p>Groundbreaking innovations and adventures are on the horizon—just wait.</p>
+                    </div>
+                </div>
+            </div>
+            <div id="timeline-details" class="timeline-details" aria-live="polite" aria-atomic="true">
+                <p>Click on a timeline item to see more details here.</p>
+            </div>
+        </div>
+    </section>
 
-  <!-- ACCOMPLISHMENTS SECTION (TIMELINE) -->
-  <section id="accomplishments" class="section">
-    <div class="content">
-      <h2>Accomplishments</h2>
-      <p>My journey speaks volumes:</p>
-      <div class="timeline">
-        <div class="timeline-item fade-in" data-year="2020">
-          <div class="timeline-content">
-            <h3>Certifications & Awards</h3>
-            <p>Got my first certifications in programming which turned a point in my career.</p>
-          </div>
+    <section id="skills" class="section" role="region" aria-labelledby="skills-heading">
+        <div class="content">
+            <h2 id="skills-heading">My Skillset</h2>
+            <p>A comprehensive overview of my programming language proficiencies.</p>
+            <div class="skill-bars">
+                <div class="skill-bar">
+                    <span class="skill-label">Python</span>
+                    <div class="skill-progress" data-skill="98" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Python skill level"></div>
+                </div>
+                <div class="skill-bar">
+                    <span class="skill-label">HTML</span>
+                    <div class="skill-progress" data-skill="97" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="HTML skill level"></div>
+                </div>
+                <div class="skill-bar">
+                    <span class="skill-label">CSS</span>
+                    <div class="skill-progress" data-skill="95" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="CSS skill level"></div>
+                </div>
+                <div class="skill-bar">
+                    <span class="skill-label">JavaScript</span>
+                    <div class="skill-progress" data-skill="96" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="JavaScript skill level"></div>
+                </div>
+                <div class="skill-bar">
+                    <span class="skill-label">C#</span>
+                    <div class="skill-progress" data-skill="92" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="C# skill level"></div>
+                </div>
+                <div class="skill-bar">
+                    <span class="skill-label">Go (Golang)</span>
+                    <div class="skill-progress" data-skill="65" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Go (Golang) skill level"></div>
+                </div>
+                <div class="skill-bar">
+                    <span class="skill-label">Rust</span>
+                    <div class="skill-progress" data-skill="62" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Rust skill level"></div>
+                </div>
+                <div class="skill-bar">
+                    <span class="skill-label">Kotlin</span>
+                    <div class="skill-progress" data-skill="68" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Kotlin skill level"></div>
+                </div>
+                <div class="skill-bar">
+                    <span class="skill-label">Assembly</span>
+                    <div class="skill-progress" data-skill="45" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Assembly skill level"></div>
+                </div>
+            </div>
         </div>
-        <div class="timeline-item fade-in" data-year="2021">
-          <div class="timeline-content">
-            <h3>First Faceit Tournament Win as IGL</h3>
-            <p>Clinched my first tournament victory as an IGL in rainbow six while peaking in YouTube views—a major milestone.</p>
-          </div>
-        </div>
-        <div class="timeline-item fade-in" data-year="2022">
-          <div class="timeline-content">
-            <h3>Unfiltered Breakthrough</h3>
-            <p>A challenging year filled with raw, transformative experiences that redefined my journey.</p>
-          </div>
-        </div>
-        <div class="timeline-item fade-in" data-year="2023">
-          <div class="timeline-content">
-            <h3>Freelance Programmer</h3>
-            <p>Started showing my skills to a small community, releasing open projects on GitHub and actively growing a Discord community.</p>
-          </div>
-        </div>
-        <div class="timeline-item fade-in" data-year="2024">
-          <div class="timeline-content">
-            <h3>Music Coming...</h3>
-            <p>Ventured into music production—an exciting new chapter in creative expression is on the horizon.</p>
-          </div>
-        </div>
-        <div class="timeline-item fade-in" data-year="2025">
-          <div class="timeline-content">
-            <h3>The Future Awaits</h3>
-            <p>Groundbreaking innovations and adventures are on the horizon—just wait.</p>
-          </div>
-        </div>
-      </div>
-      <!-- Interactive Timeline Details Panel -->
-      <div id="timeline-details" class="timeline-details"></div>
-    </div>
-  </section>
+    </section>
 
-  <!-- INTERESTS SECTION -->
-  <section id="interests" class="section code-style">
-    <div class="content">
-      <h2>Interests</h2>
-      <!-- Code Editor Window -->
-      <div class="code-window">
-        <!-- Title bar with traffic lights -->
-        <div class="code-window-titlebar">
-          <span class="window-btn close"></span>
-          <span class="window-btn minimize"></span>
-          <span class="window-btn maximize"></span>
-          <span class="title-text">interests.json</span>
+    <section id="gaming" class="section fade-in" role="region" aria-labelledby="gaming-heading">
+        <div class="content">
+            <h2 id="gaming-heading">Gaming & Socials</h2>
+            <p>Browse through my gaming profiles and connect with me on social media.</p>
+            <div class="award-wall">
+                <div class="award-card">
+                    <a href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank" rel="noopener noreferrer" aria-label="Link to Daniel's Rainbow Six Siege Tracker Profile">
+                        <img src="images/TrackerPFP.jpg" alt="R6 Tracker Profile Picture">
+                        <div class="award-title">R6 Tracker</div>
+                    </a>
+                </div>
+                <div class="award-card">
+                    <a href="https://x.com/DanielWitSwag" target="_blank" rel="noopener noreferrer" aria-label="Link to Daniel's X (formerly Twitter) Profile">
+                        <img src="images/TwitterPFP.jpg" alt="X (formerly Twitter) Profile Picture">
+                        <div class="award-title">X (Twitter)</div>
+                    </a>
+                </div>
+                <div class="award-card">
+                    <a href="https://discord.gg/aVapJsJu" target="_blank" rel="noopener noreferrer" aria-label="Link to Daniel's Discord Server">
+                        <img src="images/DiscordPFP.gif" alt="Discord Profile Picture">
+                        <div class="award-title">Discord</div>
+                    </a>
+                </div>
+                <div class="award-card">
+                    <a href="https://open.spotify.com/user/YOUR_SPOTIFY_USERNAME" target="_blank" rel="noopener noreferrer" aria-label="Link to Daniel's Spotify Profile">
+                        <img src="images/SpotifyPFP.jpg" alt="Spotify Profile Picture">
+                        <div class="award-title">Spotify</div>
+                    </a>
+                </div>
+            </div>
         </div>
-        <!-- Code Container -->
-        <pre><code id="interest-code" class="json language-json"></code></pre>
-      </div>
-      <!-- Skill Bars -->
-      <div class="skill-bars">
-        <h3>My Skill Levels</h3>
-        <div class="skill-bar">
-          <span class="skill-label">Python</span>
-          <div class="skill-progress" data-skill="90"></div>
-        </div>
-        <div class="skill-bar">
-          <span class="skill-label">HTML</span>
-          <div class="skill-progress" data-skill="85"></div>
-        </div>
-        <div class="skill-bar">
-          <span class="skill-label">CSS</span>
-          <div class="skill-progress" data-skill="80"></div>
-        </div>
-        <div class="skill-bar">
-          <span class="skill-label">JavaScript</span>
-          <div class="skill-progress" data-skill="88"></div>
-        </div>
-        <div class="skill-bar">
-          <span class="skill-label">C#</span>
-          <div class="skill-progress" data-skill="70"></div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- GAMING & TALENTS SECTION -->
-  <section id="gaming" class="section fade-in">
-    <div class="content">
-      <h2>Gaming & Talents</h2>
-      <p>Browse through my gaming hobbies, skill levels, and unique talents.</p>
-      <!-- Award wall style social categories -->
-      <div class="award-wall">
-        <div class="award-card">
-          <a href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank">
-            <img src="images/TrackerPFP.jpg" alt="R6 Tracker Profile Picture" />
-            <div class="award-title">R6 Tracker</div>
-          </a>
+    <footer role="contentinfo">
+        <div class="social-links">
+            <a href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank" rel="noopener noreferrer">R6 Tracker</a>
+            <a href="https://x.com/DanielWitSwag" target="_blank" rel="noopener noreferrer">X (Twitter)</a>
+            <a href="https://discord.gg/aVapJsJu" target="_blank" rel="noopener noreferrer">Discord</a>
+            <a href="https://open.spotify.com/user/YOUR_SPOTIFY_USERNAME" target="_blank" rel="noopener noreferrer">Spotify</a>
         </div>
-        <div class="award-card">
-          <a href="https://x.com/DanielWitSwag" target="_blank">
-            <img src="images/TwitterPFP.jpg" alt="Twitter Profile Picture" />
-            <div class="award-title">X (Twitter)</div>
-          </a>
-        </div>
-        <div class="award-card">
-          <a href="https://discord.gg/aVapJsJu" target="_blank">
-            <img src="images/DiscordPFP.gif" alt="Discord Profile Picture" />
-            <div class="award-title">Discord</div>
-          </a>
-        </div>
-        <div class="award-card">
-          <a href="https://open.spotify.com/user/dandoodlie?si=fbf5aae6577f4e35" target="_blank">
-            <img src="images/SpotifyPFP.jpg" alt="Spotify Profile Picture" />
-            <div class="award-title">Spotify</div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+        <p>© <span id="current-year"></span> DanielWitSwag. All rights reserved.</p>
+    </footer>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="social-links">
-      <a href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank">R6 Tracker</a>
-      <a href="https://x.com/DanielWitSwag" target="_blank">X (Twitter)</a>
-      <a href="https://discord.gg/aVapJsJu" target="_blank">Discord</a>
-      <a href="https://open.spotify.com/user/dandoodlie?si=fbf5aae6577f4e35" target="_blank">Spotify</a>
-    </div>
-    <p>&copy; 2023 DanielWitSwag. All rights reserved.</p>
-  </footer>
-
-  <!-- Main JS -->
-  <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
