@@ -43,24 +43,30 @@ let canvasWidth, canvasHeight;
  */
 function resizeStarfieldCanvas() {
     if (DOM.starfieldCanvas) {
-        canvasWidth = DOM.starfieldCanvas.width = window.innerWidth;
-        canvasHeight = DOM.starfieldCanvas.height = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvasWidth = window.innerWidth;
+        canvasHeight = window.innerHeight;
+        DOM.starfieldCanvas.width = canvasWidth * dpr;
+        DOM.starfieldCanvas.height = canvasHeight * dpr;
+        DOM.starfieldCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 }
 
 /**
  * Creates an array of stars with random positions, radii, and speeds.
- * @param {number} count - The number of stars to create.
+ * @param {number} [count] - Optional number of stars. Defaults to a value based on screen size.
  */
 function createStars(count) {
     stars = [];
     if (canvasWidth && canvasHeight) {
-        for (let i = 0; i < count; i++) {
+        const total = count || Math.floor((canvasWidth * canvasHeight) / 8000);
+        for (let i = 0; i < total; i++) {
             stars.push({
                 x: Math.random() * canvasWidth,
                 y: Math.random() * canvasHeight,
                 radius: Math.random() * 1.5,
-                speed: Math.random() * 0.5 + 0.1
+                speed: Math.random() * 0.5 + 0.1,
+                color: `rgba(255,255,255,${Math.random() * 0.6 + 0.4})`
             });
         }
     }
@@ -73,9 +79,8 @@ function createStars(count) {
 function animateStarfield() {
     if (DOM.starfieldCtx) {
         DOM.starfieldCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-        DOM.starfieldCtx.fillStyle = '#ffffff'; // White stars (consistent with B/W/R theme)
-
         stars.forEach(star => {
+            DOM.starfieldCtx.fillStyle = star.color;
             DOM.starfieldCtx.beginPath();
             DOM.starfieldCtx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
             DOM.starfieldCtx.fill();
@@ -99,7 +104,7 @@ function initStarfield() {
     if (DOM.starfieldCanvas) {
         DOM.starfieldCtx = DOM.starfieldCanvas.getContext('2d');
         resizeStarfieldCanvas();
-        createStars(150); // Number of stars
+        createStars();
         animateStarfield();
     } else {
         console.warn("Starfield canvas not found. Skipping starfield initialization.");
@@ -210,6 +215,8 @@ function scrollToElement(element, offset = 0) {
 document.addEventListener('DOMContentLoaded', () => {
     // Reset scroll to top on load (helps with browser refresh behavior)
     window.scrollTo(0, 0);
+
+    if (window.hljs) { hljs.highlightAll(); }
 
     // Initialize starfield background
     initStarfield();
