@@ -392,7 +392,7 @@ function handleReducedMotionChange() {
         }
 
         // Apply instant visibility/no transform for all animated elements
-        document.querySelectorAll('.fade-in, #home .content h1, #home .content p, .timeline-details, .skill-progress::after, .section .content, .timeline-item, .award-card, .social-links a').forEach(el => {
+        document.querySelectorAll('.fade-in, #home .content h1, #home .content p, .timeline-details, .skill-progress, .section .content, .timeline-item, .award-card, .social-links a').forEach(el => {
             el.style.transition = 'none';
             el.style.opacity = '1';
             el.style.transform = 'none';
