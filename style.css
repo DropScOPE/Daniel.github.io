@@ -1,1159 +1,740 @@
-/* ---------------------------------------------------- */
-/* --- 1. Imports & Custom Properties (CSS Variables) --- */
-/* ---------------------------------------------------- */
-
-/* Google Fonts - Poppins for general text, Fira Code for code blocks */
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap');
-
 :root {
-    /* Colors - Black, White, Red Palette - Refined for "Impressive" */
-    --color-primary-black: #000000; /* Pure Black for main background */
-    --color-dark-gray: #0F0F0F;    /* Very dark gray for subtle background differences */
-    --color-mid-gray: #1A1A1A;     /* Dark charcoal for elements, cards */
-    --color-light-gray: #2B2B2B;   /* Slightly lighter gray for borders, dividers */
-
-    --color-pure-white: #FFFFFF;   /* Pure White for headings, primary text */
-    --color-off-white: #E0E0E0;    /* Slightly off-white for body text, less harsh */
-    --color-subtle-white: #BBBBBB; /* Lighter gray for secondary text, placeholders */
-
-    --color-pure-red: #FF0000;     /* Vibrant, pure red for primary accents */
-    --color-bright-red: #FF3333;   /* Slightly brighter red for hover effects, glows */
-    --color-dark-red: #CC0000;     /* Deeper red for active states, stronger shadows */
-
-    /* Transparent overlays & subtle backgrounds */
-    --color-overlay-dark: rgba(0, 0, 0, 0.95);    /* Near-opaque black for fixed elements */
-    --color-overlay-mid: rgba(0, 0, 0, 0.7);     /* Semi-transparent black for content cards */
-    --color-overlay-light: rgba(255, 255, 255, 0.05); /* Very subtle white for faint highlights */
-    --color-overlay-red: rgba(255, 0, 0, 0.1);   /* Very light red overlay for subtle flair */
-
-    /* Spacing - Consistent and deliberate (Slightly reduced for "Zoom Out") */
-    --spacing-xxs: 0.3rem;  /* 5px */
-    --spacing-xs: 0.6rem;   /* ~10px */
-    --spacing-sm: 0.9rem;   /* ~14px */
-    --spacing-md: 1.2rem;   /* ~19px */
-    --spacing-lg: 1.8rem;   /* ~29px */
-    --spacing-xl: 2.5rem;   /* ~40px */
-    --spacing-xxl: 3.5rem;  /* ~56px */
-
-    /* Transitions - Smooth and impactful */
-    --transition-micro: 0.1s ease-out;  /* Very fast for tiny details */
-    --transition-fast: 0.2s ease-in-out; /* Standard interactive elements */
-    --transition-normal: 0.3s ease-in-out; /* Default for most changes */
-    --transition-slow: 0.5s ease-in-out; /* Larger element animations */
-    --transition-hero: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* For dramatic entry */
-
-    /* Borders & Radii - Modern and subtle */
-    --border-radius-sm: 4px;
-    --border-radius-md: 8px;
-    --border-radius-lg: 12px;
-    --border-thin: 1px solid var(--color-light-gray);
-    --border-focus: 2px solid var(--color-pure-red);
-
-    /* Shadows & Glows - Red-tinted for theme consistency */
-    --shadow-sm: 0 4px 8px rgba(0, 0, 0, 0.4), 0 0 5px rgba(255, 0, 0, 0.1);
-    --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 0, 0, 0.2);
-    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 0, 0, 0.3);
-    --glow-red-sm: 0 0 8px var(--color-bright-red);
-    --glow-red-lg: 0 0 20px var(--color-bright-red);
-    --glow-white-sm: 0 0 8px rgba(255, 255, 255, 0.5);
+  color-scheme: dark light;
+  --bg: #05070b;
+  --bg-elev: rgba(12, 17, 25, 0.85);
+  --bg-card: linear-gradient(160deg, rgba(14, 20, 32, 0.85), rgba(9, 13, 22, 0.92));
+  --bg-muted: rgba(255, 255, 255, 0.04);
+  --text: #f4f7fb;
+  --muted: #9fb2c9;
+  --muted-strong: #d0d9e6;
+  --brand: #4cc9f0;
+  --brand-2: #a66cff;
+  --brand-3: #ff7b54;
+  --shadow: 0 24px 70px rgba(5, 10, 20, 0.42);
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --border: 1px solid rgba(255, 255, 255, 0.08);
+  --blur: saturate(130%) blur(14px);
+  --max-width: 1120px;
+  --nav-height: 74px;
+  --font-body: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-code: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
+[data-theme="light"] {
+  color-scheme: light dark;
+  --bg: #f6f8fc;
+  --bg-elev: rgba(255, 255, 255, 0.8);
+  --bg-card: linear-gradient(150deg, rgba(255, 255, 255, 0.88), rgba(239, 244, 255, 0.94));
+  --bg-muted: rgba(12, 18, 30, 0.05);
+  --text: #0a1018;
+  --muted: #4c5a6d;
+  --muted-strong: #2d3746;
+  --brand: #2563eb;
+  --brand-2: #7c3aed;
+  --brand-3: #fb923c;
+  --shadow: 0 24px 70px rgba(43, 53, 75, 0.14);
+  --border: 1px solid rgba(12, 24, 44, 0.08);
+}
 
-/* ---------------------------------------------------- */
-/* --- 2. Base & Reset Styles --- */
-/* ---------------------------------------------------- */
-
-*, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
-    scroll-behavior: smooth;
-    /* Advanced scroll-snap for section transitions (optional, can be removed) */
-    scroll-snap-type: y proximity;
-    scroll-padding-top: 70px; /* Account for fixed nav */
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-height);
 }
 
 body {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--color-primary-black);
-    /* Subtle background pattern */
-    background-image: linear-gradient(0deg, rgba(255, 0, 0, 0.01) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255, 0, 0, 0.01) 1px, transparent 1px);
-    background-size: 20px 20px;
-    background-attachment: fixed; /* Keep pattern fixed while scrolling */
-
-    color: var(--color-off-white); /* Default body text slightly off-white */
-    line-height: 1.6;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility; /* Better font rendering */
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: radial-gradient(circle at 20% 20%, rgba(76, 201, 240, 0.08), transparent 45%),
+              radial-gradient(circle at 80% 0%, rgba(166, 108, 255, 0.12), transparent 55%),
+              radial-gradient(circle at 50% 100%, rgba(255, 123, 84, 0.12), transparent 50%),
+              var(--bg);
+  line-height: 1.6;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
 }
 
-/* Enhanced links */
+.no-js body {
+  transition: none !important;
+}
+
 a {
-    color: var(--color-pure-white); /* Links stand out in white */
-    text-decoration: none;
-    position: relative;
-    transition: color var(--transition-fast);
+  color: inherit;
+  text-decoration: none;
 }
 
-a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 1px;
-    bottom: -2px;
-    left: 0;
-    background-color: var(--color-pure-red); /* Red underline effect */
-    transition: width var(--transition-fast) ease-out;
-}
-
-a:hover {
-    color: var(--color-pure-red); /* Red text on hover */
-}
-
-a:hover::after,
-a:focus-visible::after { /* Make underline visible on focus too */
-    width: 100%;
-}
-
-a:focus-visible {
-    outline: none; /* Remove default focus outline for custom styling */
-    box-shadow: 0 0 0 2px var(--color-pure-red); /* Accessible focus ring */
-    border-radius: var(--border-radius-sm);
-}
-
-/* Enhanced buttons */
-button {
-    background: none;
-    border: none;
-    color: inherit;
-    font-family: inherit;
-    font-size: inherit;
-    cursor: pointer;
-    padding: 0;
-    transition: all var(--transition-fast);
-    position: relative; /* For potential pseudo-elements */
-}
-
+a:focus-visible,
 button:focus-visible {
-    outline: none;
-    box-shadow: var(--glow-red-sm), 0 0 0 2px var(--color-pure-red); /* Red glow and outline */
-    border-radius: var(--border-radius-sm);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 70%, transparent);
+  border-radius: var(--radius-sm);
 }
 
-/* Accessibility: Visually hidden content for screen readers */
 .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
 }
 
-
-/* ---------------------------------------------------- */
-/* --- 3. ADVANCED LOADING SCREEN --- */
-/* ---------------------------------------------------- */
-
+/* Loading ------------------------------------------------------ */
 #loading-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--color-primary-black);
-    z-index: 200;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    opacity: 1;
-    transition: opacity var(--transition-slow) ease-in-out;
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  z-index: 9999;
+  transition: opacity 450ms ease, visibility 450ms ease;
 }
 
-#loading-screen.fade-out {
-    opacity: 0;
-    pointer-events: none;
+#loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .loader-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-sm);
+  display: grid;
+  gap: 14px;
+  place-items: center;
 }
 
 .loader {
-    position: relative;
-    width: 80px; /* Slightly smaller */
-    height: 80px;
-    animation: loader-pulse 2s infinite alternate; /* Add a pulse to the loader itself */
-}
-.loader::before,
-.loader::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 4px solid transparent; /* Slightly thinner border */
-    border-radius: 50%;
-    animation: loader-spin 1.8s infinite cubic-bezier(0.68, -0.55, 0.27, 1.55); /* More dynamic animation */
-}
-.loader::before {
-    border-top-color: var(--color-pure-red);
-    border-left-color: var(--color-pure-red);
-}
-.loader::after {
-    border-bottom-color: var(--color-pure-white); /* White part of spinner */
-    border-right-color: var(--color-pure-white);
-    animation-delay: 0.9s; /* Staggered animation */
+  width: 68px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--brand);
+  border-bottom-color: color-mix(in oklab, var(--brand-2), white 12%);
+  animation: spin 0.85s linear infinite;
+  position: relative;
 }
 
-@keyframes loader-spin {
-    0% { transform: rotate(0deg); opacity: 0.8; }
-    50% { transform: rotate(180deg); opacity: 1; }
-    100% { transform: rotate(360deg); opacity: 0.8; }
-}
-
-@keyframes loader-pulse {
-    0% { transform: scale(1); filter: drop-shadow(0 0 5px var(--color-pure-red)); }
-    100% { transform: scale(1.05); filter: drop-shadow(0 0 15px var(--color-bright-red)); }
+.loader::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: inherit;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  animation: pulse 1.8s linear infinite;
 }
 
 .loading-text {
-    font-size: 1.3rem; /* Slightly smaller text */
-    font-weight: 600;
-    color: var(--color-pure-red);
-    display: flex;
-    align-items: flex-end;
-    animation: pulse-red 1.8s infinite alternate; /* Retain pulse for text */
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 0.75rem;
 }
 
-.loading-dots {
-    display: inline-block;
-    overflow: hidden;
-    width: 1.6em; /* Slightly smaller to match text size */
-    vertical-align: bottom;
-    animation: loading-dots 1.5s infinite steps(4);
-}
-@keyframes loading-dots {
-    0% { width: 0em; }
-    25% { width: 0.5em; }
-    50% { width: 1.0em; }
-    75% { width: 1.6em; }
-    100% { width: 0em; }
+.loading-dots::after {
+  content: "";
+  animation: dots 1.1s infinite steps(4, end);
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
-/* ---------------------------------------------------- */
-/* --- 4. STARFIELD BACKGROUND --- */
-/* ---------------------------------------------------- */
+@keyframes pulse {
+  to { transform: rotate(-360deg); }
+}
 
+@keyframes dots {
+  0% { content: "."; }
+  33% { content: ".."; }
+  66% { content: "..."; }
+  100% { content: ""; }
+}
+
+/* Ambient FX --------------------------------------------------- */
 #starfield {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background: transparent;
-    /* Optional: Subtle radial gradient behind stars for deeper space feel */
-    background-image: radial-gradient(circle at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.9) 70%, var(--color-primary-black) 100%);
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  display: block;
 }
 
+.ambient-lights {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -2;
+  pointer-events: none;
+}
 
-/* ---------------------------------------------------- */
-/* --- 5. NAVIGATION BAR --- */
-/* ---------------------------------------------------- */
+.glow {
+  position: absolute;
+  width: clamp(320px, 40vw, 560px);
+  aspect-ratio: 1;
+  filter: blur(120px);
+  opacity: 0.45;
+  background: radial-gradient(circle, var(--brand), transparent 60%);
+}
 
+.glow-b { background: radial-gradient(circle, var(--brand-2), transparent 70%); }
+.glow-c { background: radial-gradient(circle, var(--brand-3), transparent 70%); }
+
+.glow-a { top: -12%; left: -6%; }
+.glow-b { bottom: -22%; right: -6%; }
+.glow-c { top: 35%; right: 10%; opacity: 0.35; }
+
+/* Navigation --------------------------------------------------- */
 nav#main-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    background: var(--color-overlay-dark);
-    position: fixed;
-    width: 100%;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    box-shadow: var(--shadow-md); /* Stronger shadow for fixed nav */
-    border-bottom: 1px solid var(--color-light-gray);
-    backdrop-filter: blur(5px); /* Subtle blur for modern feel */
-    -webkit-backdrop-filter: blur(5px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--bg), transparent 20%);
+  backdrop-filter: var(--blur);
+  border-bottom: var(--border);
 }
 
-nav#main-nav .logo {
-    font-size: 1.5rem; /* Smaller logo */
-    font-weight: 700;
-    color: var(--color-pure-red);
-    text-shadow: 0 0 10px rgba(255,0,0,0.7); /* More prominent red glow */
-    letter-spacing: 1px;
-    transition: transform var(--transition-fast);
-}
-nav#main-nav .logo:hover {
-    transform: scale(1.03); /* Subtle scale on hover */
+.nav-wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 12px clamp(16px, 4vw, 32px);
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
 
-nav#main-nav ul {
-    list-style: none;
-    display: flex;
-    gap: var(--spacing-md);
+.logo {
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  font-size: 1.12rem;
+  background: linear-gradient(110deg, var(--brand) 20%, var(--brand-2) 50%, var(--brand-3));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
 }
 
-nav#main-nav ul li a {
-    color: var(--color-off-white);
-    padding: var(--spacing-xxs) var(--spacing-sm); /* Slightly smaller padding */
-    border-radius: 999px;
-    transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+.logo::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--brand) 18%, transparent);
+  opacity: 0;
+  transition: opacity 250ms ease;
+  z-index: -1;
 }
 
-a::after { /* Adjust for nav links, they use a different hover effect */
-    display: none;
+.logo:focus-visible::after,
+.logo:hover::after {
+  opacity: 0.35;
 }
 
-nav#main-nav ul li a:hover {
-    background: var(--color-overlay-red); /* Subtle red tint on hover */
-    color: var(--color-pure-red); /* Text becomes red on hover */
-    transform: translateY(-2px); /* Slight lift */
-    box-shadow: var(--glow-red-sm); /* Subtle glow */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-nav#main-nav ul li a.active {
-    background: var(--color-pure-red);
-    color: var(--color-pure-white);
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-    transform: scale(1.05); /* Slightly larger when active */
+.nav-links a,
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--muted);
+  border: var(--border);
+  background: color-mix(in oklab, var(--bg-elev), transparent 10%);
+  transition: color 180ms ease, transform 180ms ease, background 220ms ease;
 }
-nav#main-nav ul li a.active:hover {
-    background: var(--color-dark-red); /* Darker red on hover when active */
-    color: var(--color-pure-white);
+
+.nav-links a[aria-current="page"],
+.nav-links a:hover {
+  color: var(--text);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--bg-elev), white 6%), color-mix(in srgb, var(--bg-elev), black 12%));
+  transform: translateY(-1px);
 }
 
+.theme-toggle {
+  cursor: pointer;
+  font: inherit;
+  min-width: 44px;
+  justify-content: center;
+}
 
-/* ---------------------------------------------------- */
-/* --- 6. GENERAL SECTION STYLING --- */
-/* ---------------------------------------------------- */
+.theme-toggle .theme-icon {
+  font-size: 1.05rem;
+  transition: transform 220ms ease;
+}
 
+.theme-toggle:hover .theme-icon {
+  transform: rotate(12deg) scale(1.05);
+}
+
+/* Sections ----------------------------------------------------- */
 .section {
-    padding: var(--spacing-xl) var(--spacing-lg); /* Slightly reduced padding */
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    position: relative;
-    scroll-snap-align: start; /* For smooth section scrolling */
-    overflow: hidden; /* Prevent visualizer overflow */
+  padding: clamp(72px, 12vw, 120px) clamp(16px, 4vw, 32px);
+  scroll-margin-top: var(--nav-height);
 }
 
-/* Adjustments for content inside sections */
-.section .content {
-    max-width: 850px; /* Slightly narrower content area */
-    width: 90%; /* Responsive width */
-    margin: 0 auto;
-    padding: var(--spacing-lg); /* Reduced internal padding */
-    background: var(--color-overlay-mid); /* Semi-transparent black */
-    border-radius: var(--border-radius-lg); /* More rounded corners */
-    border: var(--border-thin);
-    box-shadow: var(--shadow-md);
-    position: relative; /* For inner elements positioning */
-    overflow: hidden; /* Ensure content stays within bounds */
-    transform: scale(0.98); /* Subtle initial scale for entrance animation */
-    transition: transform var(--transition-slow), opacity var(--transition-slow);
-}
-/* Entrace animation for section content (handled by JS 'visible' class) */
-.section.visible .content {
-    opacity: 1;
-    transform: scale(1);
-}
-.section .content::before { /* Subtle diagonal line graphic */
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, transparent 49.5%, rgba(255, 255, 255, 0.03) 50%, transparent 50.5%);
-    background-size: 20px 20px; /* Adjust pattern density */
-    pointer-events: none;
-    opacity: 0.1;
-    z-index: -1;
+.center {
+  max-width: var(--max-width);
+  margin: 0 auto;
 }
 
-
-.section h1, .section h2 {
-    margin-bottom: var(--spacing-md); /* More space below headings */
-    font-weight: 700;
-    color: var(--color-pure-red);
-    text-shadow: 0 0 10px rgba(255,0,0,0.5); /* Stronger red glow */
-    letter-spacing: 0.5px;
-}
-.section h2 {
-    font-size: 2.8rem; /* Slightly smaller section titles */
-}
-.section p {
-    color: var(--color-subtle-white); /* Slightly darker white for body text */
-    margin-bottom: var(--spacing-lg); /* More space after main paragraph */
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
+.section-head {
+  display: grid;
+  gap: 12px;
+  margin-bottom: clamp(28px, 6vw, 48px);
 }
 
-
-/* ---------------------------------------------------- */
-/* --- 7. HOME SECTION --- */
-/* ---------------------------------------------------- */
-
-#home {
-    min-height: 100vh; /* Ensure full viewport for home */
-    padding-top: 0; /* No top padding, content will center */
+.section-head h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: 0.6px;
 }
 
-#home .content {
-    background: transparent; /* Home content background is transparent */
-    box-shadow: none;
-    border: none;
-    padding: var(--spacing-sm); /* Minimal padding for home content */
-    transform: none; /* No scale animation here, handled by text */
+.section-head .muted {
+  max-width: min(520px, 90%);
 }
 
-#home .content h1 {
-    font-size: 4rem; /* Slightly smaller heading */
-    color: var(--color-pure-white);
-    text-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 30px var(--color-pure-red); /* White and red mixed glow */
-    margin-bottom: var(--spacing-sm);
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity var(--transition-hero), transform var(--transition-hero);
-    letter-spacing: 2px;
+.muted {
+  color: var(--muted);
 }
 
-#home .content p {
-    font-size: 1.5rem; /* Slightly smaller paragraph */
-    color: var(--color-off-white);
-    text-shadow: 0 1px 5px rgba(0,0,0,0.7);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity var(--transition-hero), transform var(--transition-hero);
-    transition-delay: 0.4s; /* Significant delay for paragraph */
-    font-style: italic; /* Subtle italic for a personal touch */
+/* Hero --------------------------------------------------------- */
+
+[data-parallax] {
+  position: relative;
+  --parallax-x: 0;
+  --parallax-y: 0;
 }
 
-#home .content h1.visible,
-#home .content p.visible {
-    opacity: 1;
-    transform: translateY(0);
+[data-parallax]::before,
+[data-parallax]::after {
+  content: "";
+  position: absolute;
+  inset: -80px;
+  background: radial-gradient(circle at 20% 20%, rgba(76, 201, 240, 0.15), transparent 60%);
+  filter: blur(120px);
+  opacity: 0.6;
+  pointer-events: none;
+  transform: translate3d(calc(var(--parallax-x) * -1px), calc(var(--parallax-y) * -1px), 0);
 }
 
-
-/* ---------------------------------------------------- */
-/* --- 8. ACCOMPLISHMENTS TIMELINE --- */
-/* ---------------------------------------------------- */
-
-#accomplishments .content {
-    background: transparent;
-    box-shadow: none;
-    border: none;
-    padding: 0;
-    transform: none; /* Handled by individual items */
+[data-parallax]::after {
+  background: radial-gradient(circle at 80% 50%, rgba(166, 108, 255, 0.2), transparent 65%);
+  opacity: 0.45;
 }
 
+.hero {
+  position: relative;
+  display: grid;
+  gap: clamp(28px, 6vw, 40px);
+  text-align: center;
+  place-items: center;
+  transform: perspective(900px) translate3d(calc(var(--parallax-x) * 1px), calc(var(--parallax-y) * 1px), 0);
+  transition: transform 260ms ease;
+}
+
+.hero-meta {
+  display: grid;
+  gap: 14px;
+  max-width: 760px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  color: var(--muted);
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.lead {
+  font-size: clamp(1rem, 2.8vw, 1.25rem);
+  color: var(--muted-strong);
+}
+
+.cta-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  border: var(--border);
+  background: color-mix(in oklab, var(--bg-elev), transparent 6%);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  transform: translateZ(0);
+  transition: transform 200ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.btn.primary {
+  background: linear-gradient(110deg, var(--brand) 10%, var(--brand-2) 55%, var(--brand-3));
+  color: #05070b;
+  border: none;
+}
+
+.btn.ghost {
+  background: color-mix(in oklab, var(--bg-elev), transparent 40%);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 45px rgba(8, 12, 22, 0.4);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: clamp(16px, 4vw, 24px);
+  width: min(720px, 100%);
+  padding: clamp(18px, 4vw, 26px);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--bg-elev), transparent 4%);
+  backdrop-filter: blur(12px);
+  border: var(--border);
+}
+
+.stats dt {
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.stats dd {
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-family: var(--font-code);
+  margin-top: 6px;
+  color: var(--text);
+  text-shadow: 0 0 12px rgba(76, 201, 240, 0.35);
+}
+
+/* Timeline ----------------------------------------------------- */
 .timeline {
-    position: relative;
-    margin: var(--spacing-xl) 0;
-    padding: var(--spacing-xl) 0;
+  display: grid;
+  gap: 18px;
+  position: relative;
 }
 
 .timeline::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 3px; /* Thicker line */
-    background: var(--color-light-gray);
-    transform: translateX(-50%);
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.5); /* Inner shadow for depth */
+  content: "";
+  position: absolute;
+  inset: 24px auto 24px 21px;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--brand), white 15%), transparent);
+  pointer-events: none;
 }
 
-.timeline-item {
-    position: relative;
-    width: 50%;
-    padding: var(--spacing-md) var(--spacing-lg); /* More padding */
-    box-sizing: border-box;
-    opacity: 0;
-    transform: translateX(50px); /* Slide in from side */
-    transition: opacity var(--transition-slow), transform var(--transition-slow);
-    cursor: pointer;
-    outline: none;
-    margin-bottom: var(--spacing-lg); /* Space between items */
+.card {
+  position: relative;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 220ms ease, border-color 200ms ease, box-shadow 220ms ease;
+  overflow: hidden;
 }
 
-.timeline-item:last-child {
-    margin-bottom: 0;
+.card::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--brand), white 10%);
+  box-shadow: 0 0 0 4px rgba(76, 201, 240, 0.22);
+  transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
-.timeline-item.visible {
-    opacity: 1;
-    transform: translateX(0);
+.card-trigger {
+  all: unset;
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+  padding-left: 28px;
 }
 
-/* Staggered transition delay for timeline items - managed by JS for better control */
-/* .timeline-item:nth-child(even) { transition-delay: 0.1s; } */
-
-
-.timeline-item:nth-child(odd) {
-    left: 0;
-    text-align: right;
-    padding-right: calc(var(--spacing-xl) + 15px); /* Space for connector line + year circle */
-    transform: translateX(-50px); /* Slide in from left */
-}
-.timeline-item:nth-child(odd).visible {
-    transform: translateX(0);
+.card h3 {
+  font-size: 1.2rem;
 }
 
-.timeline-item:nth-child(even) {
-    left: 50%;
-    text-align: left;
-    padding-left: calc(var(--spacing-xl) + 15px); /* Space for connector line + year circle */
+.card p {
+  color: var(--muted);
 }
 
-/* Year circle */
-.timeline-item::before {
-    content: attr(data-year);
-    position: absolute;
-    top: 50%; /* Center vertically on the item */
-    transform: translateY(-50%);
-    width: 45px; /* Slightly smaller year circle */
-    height: 45px;
-    background: var(--color-pure-red);
-    color: var(--color-pure-white);
-    border-radius: 50%;
-    line-height: 45px; /* Adjust line height for new size */
-    text-align: center;
-    font-weight: 700; /* Bolder year text */
-    font-size: 1.2rem; /* Slightly smaller font size */
-    box-shadow: var(--shadow-sm), var(--glow-red-sm); /* Enhanced shadow and glow */
-    z-index: 2; /* Above content and line */
-    border: 3px solid var(--color-primary-black); /* Thicker black border for cutout effect */
+.card .details {
+  margin-top: 12px;
+  padding-left: 28px;
+  color: var(--muted-strong);
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 380ms ease, opacity 260ms ease;
 }
 
-.timeline-item:nth-child(odd)::before {
-    right: -22.5px; /* Half of width to center on line */
+.card[aria-expanded="true"] {
+  transform: translateX(6px);
+  border-color: color-mix(in oklab, var(--brand), white 18%);
+  box-shadow: 0 18px 42px rgba(16, 23, 38, 0.55);
 }
 
-.timeline-item:nth-child(even)::before {
-    left: -22.5px; /* Half of width to center on line */
+.card[aria-expanded="true"]::before {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 6px rgba(76, 201, 240, 0.35);
 }
 
-.timeline-content {
-    background: var(--color-mid-gray); /* Dark charcoal background */
-    padding: var(--spacing-md);
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-sm);
-    transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
-    border: var(--border-thin);
-    position: relative; /* For diagonal line */
-    overflow: hidden; /* Keep pseudo-element inside */
+.card[aria-expanded="true"] .details {
+  max-height: 180px;
+  opacity: 1;
 }
 
-.timeline-content::before { /* Subtle diagonal pattern */
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.02) 50%, transparent 51%);
-    background-size: 15px 15px;
-    opacity: 0.2;
-    z-index: 0;
+.card .pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-code);
+  letter-spacing: 0.12em;
+  color: var(--brand);
+  border: 1px solid rgba(76, 201, 240, 0.35);
+  background: rgba(76, 201, 240, 0.08);
+  width: max-content;
 }
 
-.timeline-item:hover .timeline-content,
-.timeline-item:focus-visible .timeline-content,
-.timeline-item.active-item .timeline-content {
-    background: var(--color-dark-red); /* Darker red on hover/active */
-    transform: translateY(-8px); /* More pronounced lift */
-    box-shadow: var(--shadow-lg), var(--glow-red-lg); /* Stronger shadow and glow */
-    border-color: var(--color-pure-red); /* Red border */
-}
-/* Ensure text within content is still visible when content changes background */
-.timeline-item:hover .timeline-content h3,
-.timeline-item:hover .timeline-content p,
-.timeline-item.active-item .timeline-content h3,
-.timeline-item.active-item .timeline-content p {
-    color: var(--color-pure-white); /* Force white text */
+.spotlight {
+  margin-top: 22px;
+  display: grid;
+  gap: 10px;
 }
 
-
-.timeline-content h3 {
-    margin-bottom: var(--spacing-xs);
-    color: var(--color-pure-white);
-    font-size: 1.25rem; /* Slightly smaller heading */
-    position: relative; /* Above pseudo-element */
-    z-index: 1;
+/* Skills ------------------------------------------------------- */
+.skills {
+  display: grid;
+  gap: clamp(18px, 4vw, 26px);
 }
 
-.timeline-content p {
-    color: var(--color-off-white);
-    font-size: 0.95rem; /* Slightly smaller paragraph */
-    margin-bottom: 0;
-    position: relative;
-    z-index: 1;
-}
-
-/* Timeline Details Panel */
-.timeline-details {
-    margin-top: var(--spacing-xxl); /* More space from timeline */
-    padding: var(--spacing-lg); /* More padding */
-    background: var(--color-mid-gray);
-    border-radius: var(--border-radius-lg);
-    max-width: 650px; /* Slightly narrower panel */
-    margin-left: auto;
-    margin-right: auto;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity var(--transition-slow), transform var(--transition-slow), box-shadow var(--transition-slow);
-    text-align: left;
-    min-height: 100px; /* Slightly shorter base height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-md);
-    border: var(--border-thin);
-    position: relative;
-    overflow: hidden;
-}
-
-.timeline-details::before { /* Similar diagonal pattern */
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, transparent 49.5%, rgba(255, 0, 0, 0.05) 50%, transparent 50.5%);
-    background-size: 25px 25px; /* Larger pattern */
-    opacity: 0.4;
-    z-index: 0;
-}
-
-.timeline-details.visible {
-    opacity: 1;
-    transform: translateY(0);
-    box-shadow: var(--shadow-lg); /* Stronger shadow when visible */
-}
-.timeline-details p {
-    color: var(--color-subtle-white);
-    font-style: italic;
-    margin: 0;
-    position: relative;
-    z-index: 1;
-}
-.timeline-details:not(:empty) p {
-    font-style: normal;
-    color: var(--color-off-white);
-}
-.timeline-details h3 { /* Style loaded headings in details panel */
-    color: var(--color-pure-red);
-    font-size: 1.4rem; /* Slightly smaller */
-    margin-bottom: var(--spacing-xs);
-    text-shadow: none; /* Remove glow from specific content headings */
-}
-
-
-/* ---------------------------------------------------- */
-/* --- 9. SKILLS SECTION STYLES --- */
-/* ---------------------------------------------------- */
-
-#skills .content { /* Apply general content styling to skills section */
-    padding: var(--spacing-lg); /* Reduced padding */
-    background: var(--color-overlay-mid);
-    box-shadow: var(--shadow-md);
-    border: var(--border-thin);
-}
-#skills h2 {
-    margin-bottom: var(--spacing-lg);
-}
-#skills p {
-    margin-bottom: var(--spacing-xl); /* Reduced space below intro text */
-}
-
-/* SKILL BARS */
-.skill-bars {
-    margin-top: var(--spacing-xl); /* Reduced separation */
-    text-align: left;
-    max-width: 600px; /* Slightly narrower skill bars */
-    margin-left: auto;
-    margin-right: auto;
-    padding: var(--spacing-md);
-    background: var(--color-overlay-mid); /* Subtle background for skill section */
-    border-radius: var(--border-radius-md);
-    border: var(--border-thin);
-    box-shadow: var(--shadow-sm);
-}
-
-.skill-bars h3 { /* Changed to h2 in HTML for new section, but keeping this rule just in case */
-    margin-bottom: var(--spacing-xl); /* More space below heading */
-    text-align: center;
-    color: var(--color-pure-red);
-    font-size: 1.6rem; /* Slightly smaller skill heading */
-    text-shadow: 0 0 5px rgba(255,0,0,0.4);
-}
-
-.skill-bar {
-    margin-bottom: var(--spacing-md); /* Reduced space between bars */
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md); /* More gap */
-    position: relative;
+.skill {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: var(--border);
+  padding: 18px 20px;
+  display: grid;
+  gap: 12px;
+  box-shadow: var(--shadow);
 }
 
 .skill-label {
-    flex-shrink: 0;
-    width: 100px; /* Slightly narrower label for better alignment */
-    font-weight: 600;
-    color: var(--color-pure-white); /* White labels */
-    font-size: 1rem; /* Slightly smaller label font */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
 }
 
-.skill-progress {
-    flex-grow: 1;
-    height: 10px; /* Slightly thinner bar */
-    background: var(--color-dark-gray); /* Very dark gray for empty part */
-    border-radius: 5px; /* Match thickness */
-    overflow: hidden;
-    position: relative;
-    border: 1px solid var(--color-light-gray); /* Defined border */
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); /* Inner shadow for depth */
+.skill-label code {
+  font-family: var(--font-code);
+  color: var(--muted);
 }
 
-.skill-progress::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-pure-red) 0%, var(--color-bright-red) 100%); /* Subtle red gradient */
-    width: var(--skill-width, 0%); /* Dynamically set width via JS */
-    border-radius: 5px;
-    transition: width 1.2s cubic-bezier(0.23, 1, 0.32, 1.05); /* More bouncy animation */
-    box-shadow: 0 0 10px rgba(255,0,0,0.6); /* Glow on the progress fill */
+.bar {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--bg-muted);
+  overflow: hidden;
 }
 
-
-/* ---------------------------------------------------- */
-/* --- 10. GAMING & SOCIALS SECTION --- */
-/* ---------------------------------------------------- */
-
-#gaming .content {
-    padding: var(--spacing-lg); /* Reduced padding */
-    background: var(--color-overlay-mid);
-    box-shadow: var(--shadow-md);
-    border: var(--border-thin);
-}
-#gaming h2 {
-    margin-bottom: var(--spacing-lg);
-}
-#gaming p {
-    margin-bottom: var(--spacing-xl); /* Reduced space below intro text */
+.bar span {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--brand-3));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
-
-.award-wall {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg); /* Slightly reduced space between cards */
-    margin-top: var(--spacing-lg);
+.skill.visible .bar span {
+  transition: width 850ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.award-card {
-    background: var(--color-mid-gray);
-    padding: var(--spacing-sm); /* Reduced padding */
-    border: var(--border-thin);
-    border-radius: var(--border-radius-lg); /* More rounded */
-    transition: transform var(--transition-normal), box-shadow var(--transition-normal), background var(--transition-normal);
-    width: 160px; /* Slightly smaller cards */
-    text-align: center;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-    transform: translateY(0); /* Ensure this is reset for animation */
+/* Gaming grid -------------------------------------------------- */
+.grid {
+  display: grid;
+  gap: clamp(18px, 4vw, 28px);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.award-card::before { /* Subtle overlay on card for texture */
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, rgba(255,255,255,0.02) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.02) 75%);
-    background-size: 10px 10px;
-    opacity: 0.1;
-    z-index: 0;
+.tile {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 240ms ease;
+  transform-style: preserve-3d;
 }
 
-.award-card:hover {
-    transform: translateY(-8px) rotateZ(1deg); /* Slight lift and rotation */
-    box-shadow: var(--shadow-lg), var(--glow-red-sm); /* Stronger shadow and red glow */
-    background: var(--color-dark-red); /* Darker red on hover */
-    border-color: var(--color-pure-red); /* Red border on hover */
-}
-.award-card a {
-    display: block;
-    color: var(--color-pure-white); /* Text becomes white on hover */
-    position: relative; /* Ensure content is above ::before */
-    z-index: 1;
+.tile .img-wrap {
+  aspect-ratio: 1.6 / 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #090d14;
 }
 
-.award-card img {
-    width: 100px; /* Smaller images */
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: var(--spacing-sm);
-    border: 3px solid var(--color-primary-black); /* Thicker black border */
-    box-shadow: 0 0 8px rgba(0,0,0,0.7); /* Stronger image shadow */
-    transition: transform var(--transition-fast), border-color var(--transition-fast);
-}
-.award-card:hover img {
-    transform: scale(1.03); /* Subtle scale on image hover */
-    border-color: var(--color-pure-white); /* White border on image hover */
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.05) contrast(1.05);
+  transition: transform 280ms ease;
 }
 
-.award-title {
-    font-weight: 700; /* Bolder title */
-    font-size: 1.05rem; /* Slightly smaller title */
-    color: var(--color-pure-white);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+.tile .title {
+  font-weight: 700;
+  font-size: 1.08rem;
 }
 
+.tile .brand {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
 
-/* ---------------------------------------------------- */
-/* --- 11. FOOTER & SOCIAL LINKS --- */
-/* ---------------------------------------------------- */
+.tile:hover {
+  border-color: color-mix(in oklab, var(--brand), white 18%);
+  box-shadow: 0 22px 60px rgba(10, 15, 28, 0.55);
+}
 
+.tile:hover img {
+  transform: scale(1.04);
+}
+
+/* Footer ------------------------------------------------------- */
 footer {
-    text-align: center;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: var(--color-overlay-dark);
-    position: relative;
-    z-index: 100;
-    box-shadow: inset 0 2px 10px rgba(255,0,0,0.3); /* More pronounced red inner shadow */
-    border-top: 1px solid var(--color-light-gray);
+  padding: clamp(40px, 8vw, 60px) clamp(18px, 4vw, 32px);
+  border-top: var(--border);
+  display: grid;
+  gap: 18px;
+  color: var(--muted);
 }
 
-.social-links {
-    margin-bottom: var(--spacing-sm); /* More space */
-    display: flex;
-    justify-content: center;
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-links a {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: var(--border);
+  background: color-mix(in oklab, var(--bg-elev), transparent 30%);
+  color: var(--muted);
+  transition: color 180ms ease, transform 160ms ease, background 220ms ease;
+}
+
+.footer-links a:hover {
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.footer-meta {
+  font-size: 0.9rem;
+}
+
+/* Responsive --------------------------------------------------- */
+@media (min-width: 768px) {
+  .nav-links {
+    gap: 14px;
+  }
+
+  .hero {
+    text-align: left;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+
+  .hero-meta {
+    text-align: left;
+    justify-self: flex-start;
+  }
+
+  .cta-row {
+    justify-content: flex-start;
+  }
+
+  .stats {
+    justify-self: flex-end;
+  }
+}
+
+@media (max-width: 640px) {
+  nav#main-nav {
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-links {
     flex-wrap: wrap;
-    gap: var(--spacing-md); /* More space between links */
+    justify-content: flex-end;
+  }
+
+  .timeline::before {
+    inset: 18px auto 18px 18px;
+  }
+
+  .card {
+    padding-left: 26px;
+  }
+
+  .card::before {
+    left: 2px;
+  }
 }
 
-.social-links a {
-    color: var(--color-off-white);
-    padding: var(--spacing-xs) var(--spacing-md); /* More padding */
-    border: 1px solid var(--color-light-gray);
-    border-radius: 999px;
-    transition: background var(--transition-fast), border var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
-    font-weight: 500;
-}
-.social-links a::after { /* Remove default link underline */
-    display: none;
-}
-
-
-.social-links a:hover,
-.social-links a:focus {
-    background: var(--color-pure-red); /* Red background on hover */
-    border-color: var(--color-bright-red);
-    color: var(--color-pure-white);
-    transform: translateY(-3px); /* Subtle lift */
-    box-shadow: var(--glow-red-sm);
-}
-
-footer p {
-    font-size: 0.9rem; /* Slightly larger footer text */
-    color: var(--color-subtle-white);
-}
-
-
-/* ---------------------------------------------------- */
-/* --- 12. MEDIA QUERIES (Responsive Design) --- */
-/* ---------------------------------------------------- */
-
-/* Larger screens / Desktops */
-@media (min-width: 1200px) {
-    nav#main-nav {
-        padding: var(--spacing-md) var(--spacing-xl);
-    }
-    nav#main-nav .logo {
-        font-size: 1.8rem; /* Slightly larger logo on large screens */
-    }
-    nav#main-nav ul li a {
-        padding: var(--spacing-xs) var(--spacing-lg);
-    }
-    .section .content {
-        padding: var(--spacing-xl); /* Increased padding on large screens */
-        max-width: 900px; /* Slightly wider on large screens */
-    }
-    #home .content h1 {
-        font-size: 4.5rem;
-    }
-    #home .content p {
-        font-size: 1.8rem;
-    }
-    .section h2 {
-        font-size: 3rem;
-    }
-}
-
-/* Tablets and smaller desktops (992px) */
-@media (max-width: 992px) {
-    .section {
-        padding: calc(70px + var(--spacing-lg)) var(--spacing-sm);
-    }
-    .section .content {
-        max-width: 750px; /* Slightly narrower */
-        padding: var(--spacing-md); /* Reduced padding */
-    }
-    #home .content h1 {
-        font-size: 3.5rem;
-    }
-    #home .content p {
-        font-size: 1.4rem;
-    }
-    .section h2 {
-        font-size: 2.5rem;
-    }
-    .award-card {
-        width: 150px; /* Adjust card size */
-        margin: var(--spacing-xs); /* Adjust margin */
-    }
-    .award-card img {
-        width: 90px;
-        height: 90px;
-    }
-}
-
-/* Smaller Tablets and larger phones (768px) */
-@media (max-width: 768px) {
-    nav#main-nav {
-        flex-direction: column;
-        padding: var(--spacing-sm);
-    }
-    nav#main-nav .logo {
-        margin-bottom: var(--spacing-sm);
-        font-size: 1.4rem;
-    }
-    nav#main-nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: var(--spacing-xs);
-    }
-    nav#main-nav ul li {
-        margin-left: 0;
-    }
-
-    .section {
-        padding: calc(70px + var(--spacing-md)) var(--spacing-xs);
-        min-height: auto;
-    }
-    .section .content {
-        padding: var(--spacing-sm); /* Reduced padding */
-        margin: 0 var(--spacing-sm);
-        width: calc(100% - var(--spacing-lg)); /* Occupy more screen width */
-    }
-
-    /* Timeline Adjustments for Mobile */
-    .timeline::before {
-        left: 20px;
-        transform: translateX(0);
-    }
-    .timeline-item {
-        width: 100%;
-        left: 0 !important;
-        text-align: left !important;
-        padding-left: calc(20px + var(--spacing-lg)); /* Adjusted padding for vertical line */
-        padding-right: var(--spacing-sm);
-        transform: translateY(30px); /* Reset transform for uniform entrance */
-    }
-    .timeline-item.visible {
-        transform: translateY(0);
-    }
-    .timeline-item:nth-child(odd)::before,
-    .timeline-item:nth-child(even)::before {
-        right: auto;
-        left: 0;
-        margin-left: 0;
-    }
-    .timeline-item::before {
-        top: 20px; /* Position year circle consistently */
-        transform: translateY(0);
-        width: 40px; /* Smaller year circle */
-        height: 40px;
-        line-height: 40px;
-        font-size: 1.1rem;
-    }
-    .timeline-details {
-        min-height: 80px; /* Shorter on mobile */
-        padding: var(--spacing-md);
-    }
-
-
-    .skill-label {
-        width: 70px; /* Adjust width for smaller screens */
-        font-size: 0.9rem;
-    }
-    .skill-progress {
-        width: calc(100% - 80px); /* Adjust width based on label */
-        height: 8px; /* Thinner */
-    }
-    .skill-progress::after {
-        border-radius: 4px;
-    }
-
-    .award-card {
-        width: 140px;
-        padding: var(--spacing-xs);
-    }
-    .award-card img {
-        width: 80px;
-        height: 80px;
-    }
-    .award-title {
-        font-size: 1rem;
-    }
-}
-
-/* Smaller phones (480px) */
-@media (max-width: 480px) {
-    #home .content h1 {
-        font-size: 3rem;
-    }
-    #home .content p {
-        font-size: 1.2rem;
-    }
-    .section h2 {
-        font-size: 2rem;
-    }
-    .loader {
-        width: 60px;
-        height: 60px;
-    }
-    .loader::before, .loader::after {
-        border-width: 3px;
-    }
-    .loading-text {
-        font-size: 1rem;
-    }
-
-    .award-card {
-        width: 120px;
-        padding: var(--spacing-xxs);
-    }
-    .award-card img {
-        width: 70px;
-        height: 70px;
-    }
-    .award-title {
-        font-size: 0.9rem;
-    }
-    .social-links a {
-        font-size: 0.85rem;
-        padding: var(--spacing-xxs) var(--spacing-sm);
-    }
-}
-
-
-/* ---------------------------------------------------- */
-/* --- 13. ACCESSIBILITY / MOTION PREFERENCE --- */
-/* ---------------------------------------------------- */
-
-/* Reduce animations for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-        scroll-snap-type: none; /* Disable scroll-snap */
-    }
-    .loader::before,
-    .loader::after,
-    .loading-dots,
-    .loading-text,
-    .loader {
-        animation: none !important;
-        filter: none !important;
-        text-shadow: none !important;
-    }
-    #loading-screen {
-        transition: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        display: none !important;
-    }
-    #starfield {
-        display: none; /* Hide starfield if motion is reduced */
-    }
-
-    .fade-in,
-    #home .content h1,
-    #home .content p,
-    .timeline-details,
-    .skill-progress::after,
-    .section .content,
-    .timeline-item,
-    .award-card,
-    .social-links a {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: none !important;
-        box-shadow: var(--shadow-sm); /* Retain base shadow */
-        filter: none !important;
-        text-shadow: none !important;
-    }
-    .timeline-item:hover .timeline-content,
-    .timeline-item:focus-visible .timeline-content,
-    .timeline-item.active-item .timeline-content {
-        background: var(--color-mid-gray) !important; /* Keep base color */
-        border-color: var(--border-thin) !important;
-        box-shadow: var(--shadow-sm) !important; /* Retain base shadow */
-    }
-    .timeline-item:hover .timeline-content h3,
-    .timeline-item:hover .timeline-content p,
-    .timeline-item.active-item .timeline-content h3,
-    .timeline-item.active-item .timeline-content p {
-        color: var(--color-off-white) !important;
-    }
-    .award-card:hover {
-        background: var(--color-mid-gray) !important;
-        border-color: var(--border-thin) !important;
-    }
-    .award-card img {
-        transition: none !important;
-    }
-    .award-card:hover img {
-        transform: none !important;
-        border-color: var(--color-primary-black) !important;
-    }
-    .skill-progress::after { /* Specific for skill bars */
-        background: linear-gradient(90deg, var(--color-pure-red) 0%, var(--color-bright-red) 100%) !important;
-        box-shadow: 0 0 5px rgba(255,0,0,0.6) !important;
-    }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

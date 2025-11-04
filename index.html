@@ -19,118 +19,12 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
 
-  <!-- Base Styles: modern, fast, no external UI libs -->
-  <style>
-    :root{
-      --bg: #0b0f14;        /* dark base */
-      --bg-elev: #0f151d;    /* cards */
-      --text: #e7eef7;       /* primary text */
-      --muted: #9bb0c6;      /* secondary */
-      --brand: #4cc9f0;      /* accent */
-      --brand-2: #a66cff;    /* gradient 2 */
-      --ok: #22c55e;         /* success */
-      --warn:#f59e0b;        /* warning */
-      --danger:#ef4444;      /* danger */
-      --ring: color-mix(in oklab, var(--brand), white 15%);
-      --radius: 18px;
-      --shadow: 0 8px 30px rgba(0,0,0,.35);
-    }
-    [data-theme="light"]{
-      --bg: #f7fafc;
-      --bg-elev: #ffffff;
-      --text: #0a0d12;
-      --muted: #445063;
-      --ring: color-mix(in oklab, var(--brand), black 20%);
-    }
-
-    *, *::before, *::after{ box-sizing:border-box }
-    html{ scroll-behavior:smooth }
-    body{
-      margin:0; font-family:"Poppins", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color:var(--text); background:radial-gradient(1200px 700px at 80% -10%, rgba(76,201,240,.08), transparent 60%),
-                        radial-gradient(1100px 600px at -10% 10%, rgba(166,108,255,.08), transparent 60%),
-                        var(--bg);
-      min-height:100dvh; line-height:1.6;
-    }
-    .visually-hidden{ position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
-
-    /* Loading Screen */
-    #loading-screen{ position:fixed; inset:0; display:grid; place-items:center; background:var(--bg); z-index:9999; transition:opacity .5s ease; }
-    #loading-screen.hidden{ opacity:0; pointer-events:none }
-    .loader-container{ display:grid; place-items:center; gap:14px }
-    .loader{ width:48px; height:48px; border-radius:50%; border:3px solid rgba(255,255,255,.12); border-top-color:var(--brand); animation:spin .9s linear infinite }
-    .loading-text{ color:var(--muted); letter-spacing:.5px; font-weight:600 }
-    .loading-dots::after{ content:""; animation:dots 1.1s infinite steps(4, end) }
-    @keyframes spin{ to{ transform:rotate(360deg) } }
-    @keyframes dots{ 0%{ content:"." } 33%{ content:".." } 66%{ content:"..." } 100%{ content:"" } }
-
-    /* Starfield */
-    #starfield{ position:fixed; inset:0; z-index:-1; display:block }
-
-    /* Nav */
-    nav#main-nav{ position:sticky; top:0; z-index:50; backdrop-filter:saturate(120%) blur(8px); background:color-mix(in oklab, var(--bg), transparent 40%);
-      border-bottom:1px solid rgba(255,255,255,.06); }
-    .nav-wrap{ max-width:1100px; margin:auto; padding:10px 20px; display:flex; align-items:center; gap:20px; }
-    .logo{ font-weight:800; letter-spacing:.4px; background:linear-gradient(90deg, var(--brand), var(--brand-2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .spacer{ flex:1 }
-    .nav-links{ display:flex; gap:10px; align-items:center; }
-    .nav-links a{ display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--muted); font-weight:600; padding:8px 12px; border-radius:12px; transition:all .18s ease }
-    .nav-links a:hover, .nav-links a[aria-current="page"]{ color:var(--text); background:rgba(255,255,255,.06) }
-    .theme-toggle{ border:1px solid rgba(255,255,255,.12); background:var(--bg-elev); color:var(--text); padding:8px 12px; border-radius:12px; cursor:pointer; font:inherit }
-
-    /* Sections */
-    .section{ padding:88px 20px }
-    .center{ max-width:1100px; margin:auto }
-
-    /* Home */
-    .hero{ display:grid; gap:18px; min-height:64dvh; place-items:center; text-align:center }
-    .hero h1{ font-size: clamp(34px, 6vw, 64px); margin:0; font-weight:800; letter-spacing:.3px }
-    .hero p{ margin:0; color:var(--muted) }
-    .cta-row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:12px }
-    .btn{ display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:var(--bg-elev); color:var(--text); text-decoration:none; font-weight:700; box-shadow:var(--shadow); transform:translateZ(0); transition:transform .15s ease, background .2s ease }
-    .btn:hover{ transform:translateY(-1px) }
-    .btn.primary{ background:linear-gradient(90deg, var(--brand), var(--brand-2)); color:#061015; border:0 }
-
-    /* Timeline */
-    .timeline{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:18px }
-    .card{ background:linear-gradient(180deg, color-mix(in oklab, var(--bg-elev), #000 4%), color-mix(in oklab, var(--bg-elev), #000 14%)); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow) }
-    .card h3{ margin:.2rem 0 .1rem; font-size:1.1rem }
-    .pill{ display:inline-block; font:600 12px/1 "Fira Code", monospace; color:var(--brand); border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:6px 10px; letter-spacing:.3px }
-    .timeline button{ all:unset; display:block; width:100%; cursor:pointer }
-    .card[aria-expanded="true"]{ outline:2px solid var(--ring) }
-    .details{ max-height:0; overflow:hidden; transition:max-height .35s ease; color:var(--muted) }
-    .card[aria-expanded="true"] .details{ max-height:180px }
-
-    /* Skills */
-    .skills{ display:grid; grid-template-columns:1fr; gap:10px }
-    .skill{ display:grid; gap:8px }
-    .bar{ height:12px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden; position:relative }
-    .bar > span{ position:absolute; inset:0 auto 0 0; width:0%; background:linear-gradient(90deg, var(--brand), var(--ok)); border-radius:inherit; box-shadow:inset 0 0 0 1px rgba(255,255,255,.1) }
-    .skill-label{ display:flex; justify-content:space-between; align-items:center }
-    .skill-label code{ font-family:"Fira Code", monospace; color:var(--muted) }
-
-    /* Gaming */
-    .grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px }
-    .tile{ display:block; text-decoration:none; color:inherit }
-    .tile .img-wrap{ aspect-ratio: 1.6/1; border-radius:var(--radius); overflow:hidden; border:1px solid rgba(255,255,255,.08); background:#0c0f14; position:relative }
-    .tile img{ width:100%; height:100%; object-fit:cover; display:block; filter:saturate(.98) contrast(1.04) }
-    .tile .title{ margin:.6rem 0 0; font-weight:700 }
-    .tile .brand{ color:var(--muted); font-size:.9rem }
-    .tile:hover .img-wrap::after{ content:"Open"; position:absolute; inset:auto 8px 8px auto; background:var(--bg-elev); border:1px solid rgba(255,255,255,.12); padding:6px 10px; border-radius:999px; font:600 12px "Poppins" }
-
-    /* Footer */
-    footer{ margin-top:40px; padding:30px 20px; border-top:1px solid rgba(255,255,255,.08); color:var(--muted) }
-    .footer-links{ display:flex; gap:12px; flex-wrap:wrap }
-    .footer-links a{ color:var(--muted); text-decoration:none; border:1px solid rgba(255,255,255,.12); padding:8px 12px; border-radius:12px }
-    .footer-meta{ margin-top:10px }
-
-    /* Motion preferences */
-    @media (prefers-reduced-motion: reduce){
-      *{ animation:none !important; transition:none !important }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- Loading -->
@@ -143,147 +37,187 @@
 
   <!-- Background FX -->
   <canvas id="starfield" aria-hidden="true"></canvas>
+  <div class="ambient-lights" aria-hidden="true">
+    <span class="glow glow-a"></span>
+    <span class="glow glow-b"></span>
+    <span class="glow glow-c"></span>
+  </div>
 
   <!-- Nav -->
   <nav id="main-nav" aria-label="Main website navigation">
     <div class="nav-wrap">
-      <div class="logo" aria-label="Daniel's Domain Logo">Daniel's Domain</div>
+      <a class="logo" href="#home" aria-label="Daniel's Domain Logo">Daniel's Domain</a>
       <div class="spacer"></div>
       <div class="nav-links">
         <a href="#home" data-link>Home</a>
         <a href="#accomplishments" data-link>Accomplishments</a>
         <a href="#skills" data-link>Skills</a>
         <a href="#gaming" data-link>Gaming</a>
-        <button class="theme-toggle" id="themeToggle" aria-pressed="false" title="Toggle theme">🌙</button>
+        <button class="theme-toggle" id="themeToggle" aria-pressed="false" title="Toggle theme" type="button">
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+          <span class="visually-hidden">Toggle color theme</span>
+        </button>
       </div>
     </div>
   </nav>
 
   <!-- Home -->
-  <section id="home" class="section" role="region" aria-labelledby="home-heading">
+  <section id="home" class="section" role="region" aria-labelledby="home-heading" data-parallax>
     <div class="center hero">
-      <h1 id="home-heading">Welcome to Daniel's Digital Domain</h1>
-      <p>Welcome. I’m still building this — explore what’s live and check back for drops.</p>
+      <div class="hero-meta">
+        <span class="eyebrow">Full-stack builder • Systems tinkerer • Tactical gamer</span>
+        <h1 id="home-heading">Welcome to Daniel's Digital Domain</h1>
+        <p class="lead">I’m shipping immersive builds, high-impact automations, and competitive strategy drops. Scroll for a curated feed of what’s active.</p>
+      </div>
       <div class="cta-row">
         <a class="btn primary" href="#accomplishments">View Accomplishments</a>
-        <a class="btn" href="#gaming">Gaming & Socials</a>
+        <a class="btn ghost" href="#gaming">Gaming & Socials</a>
       </div>
+      <dl class="stats">
+        <div>
+          <dt>Projects launched</dt>
+          <dd data-count="27">00</dd>
+        </div>
+        <div>
+          <dt>Live communities</dt>
+          <dd data-count="5">00</dd>
+        </div>
+        <div>
+          <dt>Stack hours logged</dt>
+          <dd data-count="12000">00000</dd>
+        </div>
+      </dl>
     </div>
   </section>
 
   <!-- Accomplishments / Timeline -->
   <section id="accomplishments" class="section" role="region" aria-labelledby="accomplishments-heading">
     <div class="center">
-      <h2 id="accomplishments-heading">Accomplishments</h2>
-      <p class="muted">A quick timeline of pivotal moments.</p>
+      <header class="section-head">
+        <h2 id="accomplishments-heading">Accomplishments</h2>
+        <p class="muted">A kinetic timeline of pivotal milestones. Tap into a year to expand the brief.</p>
+      </header>
 
       <div class="timeline" id="timeline">
         <!-- 2020 -->
-        <button class="card" aria-expanded="false" data-year="2020">
-          <span class="pill">2020</span>
-          <h3>Certifications & Awards</h3>
-          <p class="muted">First programming certifications. Real inflection point.</p>
+        <article class="card" aria-expanded="false" data-year="2020">
+          <button type="button" class="card-trigger">
+            <span class="pill">2020</span>
+            <h3>Certifications & Awards</h3>
+            <p class="muted">First programming certifications. Real inflection point.</p>
+          </button>
           <div class="details">
             <p>Stack focus: Lua, SQL, JavaScript. Early Git discipline. Won a local hack challenge; shipped two utilities used by a 500+ user community.</p>
           </div>
-        </button>
+        </article>
         <!-- 2021 -->
-        <button class="card" aria-expanded="false" data-year="2021">
-          <span class="pill">2021</span>
-          <h3>IGL — First FACEIT Win</h3>
-          <p class="muted">Took a Rainbow Six team to a tournament win while peaking on YouTube.</p>
+        <article class="card" aria-expanded="false" data-year="2021">
+          <button type="button" class="card-trigger">
+            <span class="pill">2021</span>
+            <h3>IGL — First FACEIT Win</h3>
+            <p class="muted">Took a Rainbow Six team to a tournament win while peaking on YouTube.</p>
+          </button>
           <div class="details">
             <p>Led strats, VOD review cycles, and mental game. Translated that discipline into cleaner code reviews and shipping velocity.</p>
           </div>
-        </button>
+        </article>
         <!-- 2022 -->
-        <button class="card" aria-expanded="false" data-year="2022">
-          <span class="pill">2022</span>
-          <h3>Unfiltered Breakthrough</h3>
-          <p class="muted">Hard year. Necessary growth. Different output since.</p>
+        <article class="card" aria-expanded="false" data-year="2022">
+          <button type="button" class="card-trigger">
+            <span class="pill">2022</span>
+            <h3>Unfiltered Breakthrough</h3>
+            <p class="muted">Hard year. Necessary growth. Different output since.</p>
+          </button>
           <div class="details">
             <p>Rebuilt priorities. Cut noise. Doubled down on UI/UX rigor and performance-first coding standards.</p>
           </div>
-        </button>
+        </article>
         <!-- 2023 -->
-        <button class="card" aria-expanded="false" data-year="2023">
-          <span class="pill">2023</span>
-          <h3>Freelance Programmer</h3>
-          <p class="muted">Open-source drops, GitHub growth, Discord community.</p>
+        <article class="card" aria-expanded="false" data-year="2023">
+          <button type="button" class="card-trigger">
+            <span class="pill">2023</span>
+            <h3>Freelance Programmer</h3>
+            <p class="muted">Open-source drops, GitHub growth, Discord community.</p>
+          </button>
           <div class="details">
             <p>Shipped FiveM utilities, HUDs, and inventory prototypes. Introduced CI checks, semantic release, and docs as code.</p>
           </div>
-        </button>
+        </article>
         <!-- 2024 -->
-        <button class="card" aria-expanded="false" data-year="2024">
-          <span class="pill">2024</span>
-          <h3>Music — In Production</h3>
-          <p class="muted">Expanding into sound. Teasers coming.</p>
+        <article class="card" aria-expanded="false" data-year="2024">
+          <button type="button" class="card-trigger">
+            <span class="pill">2024</span>
+            <h3>Music — In Production</h3>
+            <p class="muted">Expanding into sound. Teasers coming.</p>
+          </button>
           <div class="details">
             <p>Learning pipeline: composition → mixing → mastering. Target: cohesive sound with ambient/industrial textures.</p>
           </div>
-        </button>
+        </article>
         <!-- 2025 -->
-        <button class="card" aria-expanded="false" data-year="2025">
-          <span class="pill">2025</span>
-          <h3>Next Up</h3>
-          <p class="muted">Groundbreaking builds and new ventures.</p>
+        <article class="card" aria-expanded="false" data-year="2025">
+          <button type="button" class="card-trigger">
+            <span class="pill">2025</span>
+            <h3>Next Up</h3>
+            <p class="muted">Groundbreaking builds and new ventures.</p>
+          </button>
           <div class="details">
             <p>Focus: flagship website, premium modules, and a cleaner personal brand system.</p>
           </div>
-        </button>
+        </article>
       </div>
 
-      <div id="timeline-details" class="card" aria-live="polite" aria-atomic="true" style="margin-top:14px">
+      <aside id="timeline-details" class="card spotlight" aria-live="polite" aria-atomic="true">
         <h3>Details</h3>
         <p class="muted">Select a year to expand and read more. The last one you open pins here.</p>
-      </div>
+      </aside>
     </div>
   </section>
 
   <!-- Skills -->
   <section id="skills" class="section" role="region" aria-labelledby="skills-heading">
     <div class="center">
-      <h2 id="skills-heading">My Skillset</h2>
-      <p class="muted">A straightforward view of where I’m strongest.</p>
+      <header class="section-head">
+        <h2 id="skills-heading">My Skillset</h2>
+        <p class="muted">A radar of proficiencies. Each bar fills when the section comes into view.</p>
+      </header>
 
       <div class="skills" id="skillsList">
-        <!-- Template driven via data attributes for easier editing -->
         <div class="skill" data-skill="Python" data-level="98">
           <div class="skill-label"><strong>Python</strong><code>98%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
         <div class="skill" data-skill="HTML" data-level="97">
           <div class="skill-label"><strong>HTML</strong><code>97%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
         <div class="skill" data-skill="CSS" data-level="95">
           <div class="skill-label"><strong>CSS</strong><code>95%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
         <div class="skill" data-skill="JavaScript" data-level="96">
           <div class="skill-label"><strong>JavaScript</strong><code>96%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
         <div class="skill" data-skill="C#" data-level="92">
           <div class="skill-label"><strong>C#</strong><code>92%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
         <div class="skill" data-skill="Go (Golang)" data-level="65">
           <div class="skill-label"><strong>Go (Golang)</strong><code>65%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
         <div class="skill" data-skill="Rust" data-level="62">
           <div class="skill-label"><strong>Rust</strong><code>62%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
         <div class="skill" data-skill="Kotlin" data-level="68">
           <div class="skill-label"><strong>Kotlin</strong><code>68%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
         <div class="skill" data-skill="Assembly" data-level="45">
           <div class="skill-label"><strong>Assembly</strong><code>45%</code></div>
-          <div class="bar"><span></span></div>
+          <div class="bar" role="presentation"><span></span></div>
         </div>
       </div>
     </div>
@@ -292,11 +226,13 @@
   <!-- Gaming & Socials -->
   <section id="gaming" class="section" role="region" aria-labelledby="gaming-heading">
     <div class="center">
-      <h2 id="gaming-heading">Gaming & Socials</h2>
-      <p class="muted">Browse my profiles and connect.</p>
+      <header class="section-head">
+        <h2 id="gaming-heading">Gaming & Socials</h2>
+        <p class="muted">Browse my profiles and connect. Each card tilts gently with pointer movement.</p>
+      </header>
 
       <div class="grid">
-        <a class="tile" href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank" rel="noopener noreferrer" aria-label="R6 Tracker">
+        <a class="tile" href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank" rel="noopener noreferrer" aria-label="R6 Tracker" data-tilt>
           <div class="img-wrap">
             <img loading="lazy" src="images/TrackerPFP.jpg" alt="R6 Tracker Profile Picture" />
           </div>
@@ -304,7 +240,7 @@
           <div class="brand">tracker.network</div>
         </a>
 
-        <a class="tile" href="https://x.com/DanielWitSwag" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)">
+        <a class="tile" href="https://x.com/DanielWitSwag" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)" data-tilt>
           <div class="img-wrap">
             <img loading="lazy" src="images/TwitterPFP.jpg" alt="X (formerly Twitter) Profile Picture" />
           </div>
@@ -312,7 +248,7 @@
           <div class="brand">x.com</div>
         </a>
 
-        <a class="tile" href="https://discord.gg/aVapJsJu" target="_blank" rel="noopener noreferrer" aria-label="Discord Server">
+        <a class="tile" href="https://discord.gg/aVapJsJu" target="_blank" rel="noopener noreferrer" aria-label="Discord Server" data-tilt>
           <div class="img-wrap">
             <img loading="lazy" src="images/DiscordPFP.gif" alt="Discord Profile Picture" />
           </div>
@@ -320,7 +256,7 @@
           <div class="brand">discord.gg</div>
         </a>
 
-        <a class="tile" href="https://open.spotify.com/user/YOUR_SPOTIFY_USERNAME" target="_blank" rel="noopener noreferrer" aria-label="Spotify Profile">
+        <a class="tile" href="https://open.spotify.com/user/YOUR_SPOTIFY_USERNAME" target="_blank" rel="noopener noreferrer" aria-label="Spotify Profile" data-tilt>
           <div class="img-wrap">
             <img loading="lazy" src="images/SpotifyPFP.jpg" alt="Spotify Profile Picture" />
           </div>
@@ -344,101 +280,6 @@
     </div>
   </footer>
 
-  <!-- Scripts: vanilla, tiny, fast -->
-  <script>
-    // Replace no-js class
-    document.documentElement.classList.remove('no-js');
-
-    // Theme boot — prefers-color-scheme aware
-    const themeKey = 'dd-theme';
-    const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
-    const saved = localStorage.getItem(themeKey);
-    const setTheme = (mode) => { document.documentElement.setAttribute('data-theme', mode); localStorage.setItem(themeKey, mode); };
-    if(saved){ setTheme(saved); } else { setTheme(prefersLight.matches ? 'light' : 'dark'); }
-    prefersLight.addEventListener('change', (e)=>{ if(!localStorage.getItem(themeKey)) setTheme(e.matches ? 'light' : 'dark'); });
-
-    // Theme toggle
-    const themeToggle = document.getElementById('themeToggle');
-    const icon = () => document.documentElement.getAttribute('data-theme') === 'light' ? '🌞' : '🌙';
-    themeToggle.textContent = icon();
-    themeToggle.addEventListener('click', ()=>{ const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light'; setTheme(next); themeToggle.textContent = icon(); themeToggle.setAttribute('aria-pressed', next === 'dark'); });
-
-    // Loading screen hide
-    window.addEventListener('load', ()=>{
-      const ls = document.getElementById('loading-screen');
-      requestAnimationFrame(()=> ls.classList.add('hidden'));
-    });
-
-    // Year
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-
-    // Scroll spy for nav
-    const links = [...document.querySelectorAll('[data-link]')];
-    const sections = links.map(a => document.querySelector(a.getAttribute('href')));
-    const spy = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){
-          links.forEach(l=> l.removeAttribute('aria-current'));
-          const link = links.find(l => l.getAttribute('href') === '#' + e.target.id);
-          if(link) link.setAttribute('aria-current','page');
-        }
-      });
-    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0.01 });
-    sections.forEach(s=> s && spy.observe(s));
-
-    // Timeline expand + detail pin
-    const detail = document.getElementById('timeline-details');
-    document.getElementById('timeline').addEventListener('click', (e)=>{
-      const card = e.target.closest('.card'); if(!card) return;
-      const expanded = card.getAttribute('aria-expanded') === 'true';
-      document.querySelectorAll('.timeline .card').forEach(c=> c.setAttribute('aria-expanded','false'));
-      card.setAttribute('aria-expanded', String(!expanded));
-      if(!expanded){
-        const year = card.dataset.year;
-        const title = card.querySelector('h3').textContent;
-        const text = card.querySelector('.details').innerHTML;
-        detail.innerHTML = `<h3>${year} — ${title}</h3>${text}`;
-      }
-    });
-
-    // Skill bars animate on view
-    const skillIO = new IntersectionObserver((entries)=>{
-      entries.forEach(({isIntersecting, target})=>{
-        if(!isIntersecting) return;
-        const level = Number(target.dataset.level || target.querySelector('code')?.textContent.replace('%','')) || 0;
-        const span = target.querySelector('.bar > span');
-        span.style.transition = 'width 900ms cubic-bezier(.2,.9,.2,1)';
-        requestAnimationFrame(()=> span.style.width = level + '%');
-        skillIO.unobserve(target);
-      });
-    },{ threshold:.35 });
-    document.querySelectorAll('.skill').forEach(s=> skillIO.observe(s));
-
-    // Lightweight starfield (no allocations on tick)
-    (()=>{
-      const c = document.getElementById('starfield');
-      const ctx = c.getContext('2d', { alpha: true });
-      let w, h, stars;
-      const STAR_COUNT = 140;
-      const set = ()=>{ w = c.width = innerWidth * devicePixelRatio; h = c.height = innerHeight * devicePixelRatio; ctx.scale(1,1); stars = new Array(STAR_COUNT).fill().map(()=>({ x: Math.random()*w, y: Math.random()*h, z: Math.random()*0.8 + 0.2, s: Math.random()*1.5 + .2 })); };
-      set();
-      addEventListener('resize', set);
-      let last = performance.now();
-      function tick(now){
-        const dt = Math.min(33, now - last); last = now;
-        ctx.clearRect(0,0,w,h);
-        for(let i=0;i<stars.length;i++){
-          const st = stars[i];
-          st.x += st.z * 0.18 * dt; // drift
-          if(st.x > w){ st.x = 0; st.y = Math.random()*h; }
-          const alpha = 0.4 + st.z * 0.6;
-          ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-          ctx.fillRect(st.x, st.y, st.s, st.s);
-        }
-        requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
-    })();
-  </script>
+  <script src="script.js" defer></script>
 </body>
 </html>
