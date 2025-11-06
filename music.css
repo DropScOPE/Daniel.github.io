@@ -1,0 +1,65 @@
+/* Floating vinyl play/pause button */
+.vinyl{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 900;
+  width: 68px;
+  height: 68px;
+  border-radius: 999px;
+  border: 1px solid var(--edge, #2a2a2a);
+  background: var(--bg3, #171717);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+  user-select: none;
+}
+.vinyl:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,0,0,.45);
+  box-shadow: 0 12px 36px rgba(255,0,0,.18), 0 10px 30px rgba(0,0,0,.5);
+}
+.vinyl:focus-visible{ outline: 2px solid rgba(255,0,0,.6) }
+
+.vinyl img{
+  width: 54px;
+  height: 54px;
+  display: block;
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(255,0,0,.18));
+  transform-origin: 50% 50%;
+  animation: vinyl-spin 3.6s linear infinite;
+  animation-play-state: paused; /* default paused */
+}
+
+/* subtle ring/glow */
+.vinyl-ring{
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,0,0,.20), transparent 48%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.08), transparent 60%);
+  opacity: .35;
+  transition: opacity .18s ease;
+}
+.vinyl:hover .vinyl-ring{ opacity: .55 }
+
+/* When playing, spin image */
+.vinyl.is-playing img{
+  animation-play-state: running;
+}
+
+/* Keyframes */
+@keyframes vinyl-spin{
+  to{ transform: rotate(360deg) }
+}
+
+/* Small screens */
+@media (max-width: 480px){
+  .vinyl{ width: 60px; height: 60px; right: 12px; bottom: 12px; }
+  .vinyl img{ width: 48px; height: 48px; }
+}
