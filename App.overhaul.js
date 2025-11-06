@@ -1,218 +1,154 @@
-/* ===========================================================================
-   Daniel's Digital Domain — JS Overhaul (110%)
-   Paradigm: modular, a11y-first, perf-aware, zero deps.
-   Features: Theme manager, Loading gate, Starfield engine (HiDPI),
-             Section reveal + nav spy, Smooth router-like scroll,
-             Timeline controller, Skills animator, Typewriter, Utilities.
-   =========================================================================== */
+/* Daniel's Digital Domain — Compatibility JS (110%)
+   Maps old HTML structure to the new engine, so no HTML edits are needed.
+   - Works with: #loading-screen, #starfield canvas, #timeline, .timeline-item,
+                 #timeline-details, .skill-progress[data-skill], nav#main-nav a, etc.
+   - Adds: theme toggle persistence, reveal/spy, HiDPI starfield, smoother timeline,
+           skill bar animation, reduced-motion safety.
+*/
 (() => {
   'use strict';
 
-  /* ----------------------------------------------------------------------- */
-  /* 0) Guards & Globals                                                     */
-  /* ----------------------------------------------------------------------- */
-  const d = document;
-  const w = window;
-  const docEl = d.documentElement;
-  const DPR = w.devicePixelRatio || 1;
+  // ---- DOM helpers
+  const d = document, w = window, DPR = w.devicePixelRatio || 1;
+  const qs  = (s, r=d) => r.querySelector(s);
+  const qsa = (s, r=d) => Array.from(r.querySelectorAll(s));
+  const isRM = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const qs  = (sel, root = d) => root.querySelector(sel);
-  const qsa = (sel, root = d) => Array.from(root.querySelectorAll(sel));
+  // ---- Selectors: support BOTH new + your current HTML
+  const $loading     = qs('#loading') || qs('#loading-screen');
+  const $starCanvas  = qs('canvas#starfield');         // your existing canvas
+  const $starWrap    = $starCanvas || qs('.starfield'); // either canvas or container
+  const $homeH1      = qs('#home .content h1') || qs('#home h1');
+  const $homeP       = qs('#home .content p') || qs('#home p');
+  const $timeline    = qs('#timeline');
+  const $timelineDet = qs('#timelineDetails') || qs('#timeline-details');
+  const $skillsRows  = qsa('.skills__row'); // new
+  const $skillBars   = qsa('.skill-progress, .skills__bar'); // your old + new
+  const $sections    = qsa('section');
+  const $navLinks    = qsa('nav#main-nav a[href^="#"], [data-link]');
 
-  const isReducedMotion = () => w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // ---- Utilities
+  const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+  const raf = (fn) => requestAnimationFrame(fn);
 
-  const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-  const lerp  = (a, b, t) => a + (b - a) * t;
-
-  const debounce = (fn, wait = 150) => {
-    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(null, args), wait); };
-  };
-  const throttle = (fn, limit = 100) => {
-    let inThrottle = false, lastArgs = null;
-    return function run(...args) {
-      if (inThrottle) { lastArgs = args; return; }
-      inThrottle = true; fn.apply(null, args);
-      setTimeout(() => { inThrottle = false; if (lastArgs) { run(...lastArgs); lastArgs = null; } }, limit);
-    };
-  };
-
-  const raf = (cb) => requestAnimationFrame(cb);
-
-  /* ----------------------------------------------------------------------- */
-  /* 1) Theme Manager                                                        */
-  /* ----------------------------------------------------------------------- */
-  const Theme = (() => {
+  // ---- Theme
+  const Theme = (()=> {
     const KEY = 'dd-theme';
-    const mql = w.matchMedia('(prefers-color-scheme: light)');
+    const mql = matchMedia('(prefers-color-scheme: light)');
     const get = () => localStorage.getItem(KEY);
-    const apply = (mode) => { docEl.setAttribute('data-theme', mode); };
-    const set = (mode) => { apply(mode); localStorage.setItem(KEY, mode); };
-    const init = () => { const saved = get(); apply(saved || (mql.matches ? 'light' : 'dark')); };
-    const toggle = () => set(docEl.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+    const apply = (m) => d.documentElement.setAttribute('data-theme', m);
+    const set = (m) => { apply(m); localStorage.setItem(KEY, m); };
+    const init = () => apply(get() || (mql.matches ? 'light' : 'dark'));
     const bind = () => {
-      const btn = qs('#themeToggle'); if (!btn) return;
-      const icon = () => docEl.getAttribute('data-theme') === 'light' ? '🌞' : '🌙';
+      const btn = qs('#themeToggle');
+      if (!btn) return;
+      const icon = () => d.documentElement.getAttribute('data-theme') === 'light' ? '🌞' : '🌙';
       btn.textContent = icon();
-      btn.setAttribute('aria-pressed', docEl.getAttribute('data-theme') !== 'light');
-      btn.addEventListener('click', () => { toggle(); btn.textContent = icon(); btn.setAttribute('aria-pressed', docEl.getAttribute('data-theme') !== 'light'); });
-      mql.addEventListener('change', (e) => { if (!get()) apply(e.matches ? 'light' : 'dark'); btn.textContent = icon(); });
+      btn.addEventListener('click', ()=>{
+        const next = d.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        set(next); btn.textContent = icon(); btn.setAttribute('aria-pressed', next !== 'light');
+      });
+      mql.addEventListener('change', e => { if (!get()) apply(e.matches ? 'light' : 'dark'); btn.textContent = icon(); });
     };
     return { init, bind };
   })();
 
-  /* ----------------------------------------------------------------------- */
-  /* 2) Loading Gate                                                         */
-  /* ----------------------------------------------------------------------- */
-  const Loading = (() => {
-    const el = qs('#loading');
-    let minGateStart = performance.now();
-    const hide = () => { if (!el) return; el.setAttribute('hidden', ''); };
+  // ---- Loading gate (respects both ids)
+  const Loading = (()=> {
+    const hide = () => { if ($loading) { $loading.classList.add('hidden'); $loading.setAttribute('aria-hidden','true'); } };
     const ready = () => {
-      if (!el) return; const delta = performance.now() - minGateStart; const remain = Math.max(0, 400 - delta);
-      setTimeout(hide, remain);
+      if (!$loading) return;
+      if (isRM()) { hide(); return; }
+      // min 400ms gate for smoother feel; yours was 3s – not necessary.
+      setTimeout(hide, 400);
     };
     return { ready };
   })();
 
-  /* ----------------------------------------------------------------------- */
-  /* 3) Starfield Engine (HiDPI canvas, Offscreen fallback safe)             */
-  /* ----------------------------------------------------------------------- */
-  const Starfield = (() => {
-    let canvas, ctx, W = 0, H = 0, stars = [], running = false, last = 0;
-    const MAX = 160; // number of stars
-    const SPEED = 0.18; // px/ms scaled by depth
+  // ---- Starfield (HiDPI). Works on existing <canvas id="starfield">
+  const Starfield = (()=> {
+    if (!$starWrap || isRM()) return { start:()=>{}, stop:()=>{} };
+    const canvas = $starCanvas || d.createElement('canvas');
+    if (!$starCanvas) $starWrap.appendChild(canvas);
 
-    const container = qs('.starfield');
-
-    const createCanvas = () => {
-      if (!container) return null;
-      // Reuse existing canvas or create one
-      let c = container.querySelector('canvas');
-      if (!c) { c = d.createElement('canvas'); container.appendChild(c); }
-      return c;
-    };
+    const ctx = canvas.getContext('2d', { alpha:true });
+    let W=0, H=0, stars=[], last=0, running=false;
+    const SPEED = 0.18;
 
     const resize = () => {
-      if (!canvas) return;
-      const b = container.getBoundingClientRect();
-      W = Math.max(1, Math.floor(b.width * DPR));
-      H = Math.max(1, Math.floor((w.innerHeight || b.height) * DPR));
-      canvas.width = W; canvas.height = H; canvas.style.width = `${W / DPR}px`; canvas.style.height = `${H / DPR}px`;
-      // Rebuild star field
-      const count = clamp(Math.floor((W / DPR) * (H / DPR) / 9000), 80, MAX);
-      stars = new Array(count).fill(0).map(() => ({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        z: Math.random() * 0.8 + 0.2, // depth 0.2-1.0
-        s: Math.random() * 1.5 + 0.2   // size
-      }));
+      const rect = ($starCanvas ? canvas : $starWrap).getBoundingClientRect();
+      W = Math.max(1, Math.floor(rect.width * DPR));
+      H = Math.max(1, Math.floor((w.innerHeight || rect.height) * DPR));
+      canvas.width = W; canvas.height = H;
+      canvas.style.width = `${W/DPR}px`; canvas.style.height = `${H/DPR}px`;
+      const count = clamp(Math.floor((W/DPR)*(H/DPR)/9000), 80, 180);
+      stars = new Array(count).fill(0).map(()=>({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8+0.2, s: Math.random()*1.5+0.2 }));
     };
 
     const draw = (now) => {
-      if (!running || !ctx) return;
-      const dt = Math.min(34, now - last || 16); last = now;
-      ctx.clearRect(0, 0, W, H);
-      for (let i = 0; i < stars.length; i++) {
+      if (!running) return;
+      const dt = Math.min(34, now - (last||now)); last = now;
+      ctx.clearRect(0,0,W,H);
+      for (let i=0;i<stars.length;i++){
         const st = stars[i];
         st.x += st.z * SPEED * dt * DPR;
-        if (st.x > W) { st.x = 0; st.y = Math.random() * H; }
-        const alpha = 0.4 + st.z * 0.6;
-        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-        ctx.fillRect(st.x, st.y, st.s * DPR, st.s * DPR);
+        if (st.x > W){ st.x = 0; st.y = Math.random()*H; }
+        ctx.fillStyle = `rgba(255,255,255,${0.4 + st.z*0.6})`;
+        ctx.fillRect(st.x, st.y, st.s*DPR, st.s*DPR);
       }
       raf(draw);
     };
 
-    const start = () => {
-      if (!container || isReducedMotion()) return;
-      canvas = createCanvas(); if (!canvas) return;
-      ctx = canvas.getContext('2d', { alpha: true }); if (!ctx) return;
-      resize(); running = true; last = performance.now(); raf(draw);
-    };
-
-    const stop = () => { running = false; };
-
-    const bind = () => {
-      if (!container) return;
-      const ro = new ResizeObserver(throttle(resize, 100));
-      ro.observe(container);
-      w.addEventListener('resize', throttle(resize, 120));
-      w.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
-        if (e.matches) { stop(); if (canvas) canvas.style.display = 'none'; }
-        else { if (canvas) canvas.style.display = ''; start(); }
-      });
-    };
-
-    return { start, stop, bind };
+    const start = () => { resize(); running=true; raf(draw); };
+    const stop  = () => { running=false; };
+    addEventListener('resize', resize);
+    matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => e.matches ? stop() : start());
+    return { start, stop };
   })();
 
-  /* ----------------------------------------------------------------------- */
-  /* 4) Typewriter (progressive, cancel-safe)                                */
-  /* ----------------------------------------------------------------------- */
-  class Typewriter {
-    constructor(el, text, delay = 28) { this.el = el; this.text = text; this.delay = delay; this._i = 0; this._id = 0; }
-    start(cb) {
-      if (!this.el || !this.text) { cb && cb(); return; }
-      this.el.textContent = '';
-      const tick = () => {
-        if (this._i >= this.text.length) { cb && cb(); return; }
-        this.el.textContent += this.text.charAt(this._i++);
-        this._id = setTimeout(tick, this.delay);
-      };
-      tick();
-    }
-    cancel() { clearTimeout(this._id); }
-  }
-
-  /* ----------------------------------------------------------------------- */
-  /* 5) Reveal Observer + Nav Spy                                            */
-  /* ----------------------------------------------------------------------- */
-  const Reveal = (() => {
-    let revealIO, spyIO;
-    const links = qsa('[data-link]');
+  // ---- Reveal + nav spy (works with your anchors)
+  const RevealSpy = (()=> {
+    const links = $navLinks;
     const sections = links.map(a => qs(a.getAttribute('href'))).filter(Boolean);
 
-    const init = () => {
-      revealIO = new IntersectionObserver((entries) => {
-        for (const e of entries) if (e.isIntersecting) e.target.classList.add('is-visible');
-      }, { rootMargin: '-15% 0px', threshold: 0.08 });
-      qsa('.section').forEach(s => revealIO.observe(s));
+    const revealIO = new IntersectionObserver(entries => {
+      for (const e of entries) if (e.isIntersecting) e.target.classList.add('visible','is-visible');
+    }, { rootMargin: '-12% 0px', threshold: 0.08 });
 
-      spyIO = new IntersectionObserver((entries) => {
-        for (const e of entries) {
-          if (!e.isIntersecting) continue;
-          links.forEach(l => l.removeAttribute('aria-current'));
-          const id = '#' + e.target.id; const a = links.find(l => l.getAttribute('href') === id);
-          if (a) a.setAttribute('aria-current', 'page');
-        }
-      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0.01 });
+    const spyIO = new IntersectionObserver(entries => {
+      for (const e of entries){
+        if (!e.isIntersecting) continue;
+        links.forEach(l => l.removeAttribute('aria-current'));
+        const id = '#' + e.target.id;
+        const a = links.find(l => l.getAttribute('href') === id);
+        if (a) a.setAttribute('aria-current','page');
+      }
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0.01 });
+
+    const init = () => {
+      qsa('.section, section').forEach(s => revealIO.observe(s));
       sections.forEach(s => spyIO.observe(s));
     };
     return { init };
   })();
 
-  /* ----------------------------------------------------------------------- */
-  /* 6) Router‑like Smooth Scroll (offset aware)                              */
-  /* ----------------------------------------------------------------------- */
-  const SmoothScroll = (() => {
-    const TOP_OFFSET = 0; // Header is fixed but compact; CSS uses scroll-padding
+  // ---- Smooth anchor scroll (offsetless; your CSS already uses scroll-padding)
+  const Smooth = (()=> {
     const onClick = (e) => {
       const a = e.target.closest('a[href^="#"]'); if (!a) return;
-      const id = a.getAttribute('href'); if (id.length < 2) return;
+      const id = a.getAttribute('href'); if (!id || id.length < 2) return;
       const el = qs(id); if (!el) return;
       e.preventDefault();
-      const y = el.getBoundingClientRect().top + w.scrollY - TOP_OFFSET;
-      w.scrollTo({ top: y, behavior: 'smooth' });
-      history.replaceState(null, '', id);
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null,'',id);
     };
     const bind = () => d.addEventListener('click', onClick);
     return { bind };
   })();
 
-  /* ----------------------------------------------------------------------- */
-  /* 7) Timeline Controller                                                   */
-  /* ----------------------------------------------------------------------- */
-  const Timeline = (() => {
+  // ---- Timeline controller (supports your .timeline-item structure)
+  const Timeline = (()=> {
+    if (!$timeline) return { bind:()=>{} };
     const map = {
       2020: 'Stack: Lua, SQL, JavaScript. Early Git discipline. Won a local hack challenge; shipped two utilities used by a 500+ user community.',
       2021: 'Led strats, VOD reviews, and mental game. Discipline → cleaner code reviews, faster shipping.',
@@ -221,88 +157,118 @@
       2024: 'Learning composition → mixing → mastering. Ambient/industrial textures.',
       2025: 'Flagship site, premium modules, unified brand system.'
     };
-    const details = qs('#timelineDetails');
+    const items = qsa('.timeline__item, .timeline-item, #timeline .card[aria-expanded]');
 
-    const activate = (item) => {
-      qsa('.timeline__item[aria-current="true"]').forEach(i => i.setAttribute('aria-current', 'false'));
-      item.setAttribute('aria-current', 'true');
-      const y = item.dataset.year; const title = item.querySelector('h3')?.textContent || '';
-      if (details) { details.innerHTML = `<div><h3>${y} — ${title}</h3><p>${map[y]||''}</p></div>`; details.classList.add('is-visible'); }
+    const extractTitle = (el) => (el.querySelector('h3') && el.querySelector('h3').textContent) || el.getAttribute('data-title') || 'Details';
+    const extractYear  = (el) => el.dataset.year || el.getAttribute('data-year') || (el.querySelector('.pill')?.textContent?.trim()) || '';
+
+    const activate = (it) => {
+      items.forEach(i => i.setAttribute('aria-current','false'));
+      it.setAttribute('aria-current','true');
+      const y = extractYear(it), t = extractTitle(it);
+      if ($timelineDet){
+        // If your HTML already renders inner details, prefer that
+        const inner = it.querySelector('.timeline-content, .details');
+        $timelineDet.innerHTML = inner ? inner.innerHTML : `<h3>${y} — ${t}</h3><p>${map[y]||''}</p>`;
+        $timelineDet.classList.add('visible','is-visible');
+      }
     };
 
     const bind = () => {
-      const wrap = qs('#timeline'); if (!wrap) return;
-      wrap.addEventListener('click', (e) => { const it = e.target.closest('.timeline__item'); if (it) activate(it); });
-      qsa('.timeline__item').forEach(it => it.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); activate(it); } }));
+      $timeline.addEventListener('click', (e) => {
+        const it = e.target.closest('.timeline__item, .timeline-item, #timeline .card[aria-expanded]');
+        if (!it) return;
+        // support old cards that toggle aria-expanded
+        if (it.hasAttribute('aria-expanded')) {
+          const exp = it.getAttribute('aria-expanded') === 'true';
+          qsa('#timeline .card[aria-expanded]').forEach(c => c.setAttribute('aria-expanded','false'));
+          it.setAttribute('aria-expanded', String(!exp));
+        }
+        activate(it);
+      });
+      items.forEach(it => it.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(it); }}));
     };
     return { bind };
   })();
 
-  /* ----------------------------------------------------------------------- */
-  /* 8) Skills Animator                                                       */
-  /* ----------------------------------------------------------------------- */
-  const Skills = (() => {
-    let io;
-    const init = () => {
-      io = new IntersectionObserver((entries) => {
-        for (const { isIntersecting, target } of entries) {
-          if (!isIntersecting) continue;
-          const lvl = Number(target.dataset.level) || 0;
-          const bar = target.querySelector('.skills__bar');
-          if (bar) raf(() => { bar.style.inlineSize = clamp(lvl, 0, 100) + '%'; });
-          io.unobserve(target);
+  // ---- Skills animator (supports .skill-progress[data-skill])
+  const Skills = (()=> {
+    const rows = $skillsRows.length ? $skillsRows : qsa('.skill, .skill-progress[aria-valuenow], .skill-progress[data-skill]');
+    const io = new IntersectionObserver((entries, obs)=>{
+      for (const { isIntersecting, target } of entries) {
+        if (!isIntersecting) continue;
+        const bar = target.matches('.skill-progress') ? target : target.querySelector('.skills__bar, .bar > span, .skill-progress');
+        if (!bar) { obs.unobserve(target); continue; }
+        // level extraction (prefer data-skill, then aria-valuenow, then inner code %)
+        const container = target.matches('.skill-progress') ? target : target.closest('.skill') || target;
+        let lvl = Number(container?.dataset?.skill || bar?.dataset?.skill || container?.getAttribute('aria-valuenow') || 0);
+        if (!lvl) {
+          const code = (container.querySelector('code')?.textContent || '').replace('%','');
+          lvl = Number(code||0);
         }
-      }, { threshold: 0.35 });
-      qsa('.skills__row').forEach(r => io.observe(r));
-    };
+        lvl = clamp(lvl, 0, 100);
+        // old structure: CSS uses --skill-width on .skill-progress
+        if (bar.classList.contains('skill-progress')) bar.style.setProperty('--skill-width', lvl + '%');
+        // new structure: width on .skills__bar or .bar>span
+        bar.style.width = lvl + '%';
+        container.setAttribute('aria-valuenow', String(lvl));
+        obs.unobserve(target);
+      }
+    }, { threshold: .35 });
+    const init = () => rows.forEach(r => io.observe(r));
     return { init };
   })();
 
-  /* ----------------------------------------------------------------------- */
-  /* 9) Home Typewriter intro                                                */
-  /* ----------------------------------------------------------------------- */
-  const Intro = (() => {
-    const h = qs('#home h1');
-    const p = qs('#home .content p');
-    const run = () => {
-      if (!h || !p || isReducedMotion()) return; // respect motion prefs
-      const th = new Typewriter(h, h.textContent.trim(), 24);
-      const tp = new Typewriter(p, p.textContent.trim(), 18);
-      th.start(() => { h.classList.add('is-visible'); tp.start(() => p.classList.add('is-visible')); });
-    };
-    return { run };
-  })();
-
-  /* ----------------------------------------------------------------------- */
-  /* 10) Boot                                                                 */
-  /* ----------------------------------------------------------------------- */
-  const Boot = () => {
-    // Remove no-js
-    docEl.classList.remove('no-js');
-
-    // Theme
-    Theme.init();
-    Theme.bind();
-
-    // Loading gate after window load
-    w.addEventListener('load', Loading.ready);
-
-    // Core controllers
-    Reveal.init();
-    SmoothScroll.bind();
-    Timeline.bind();
-    Skills.init();
-
-    // Dynamic visuals
-    Starfield.bind();
-    Starfield.start();
-
-    // Intro typing
-    Intro.run();
-
-    // Footer year
-    const yearEl = qs('#year'); if (yearEl) yearEl.textContent = new Date().getFullYear();
+  // ---- Typewriter intro (safe if content exists; respects reduced motion)
+  const Typewriter = (el, txt, delay=22) => {
+    if (!el || !txt || isRM()) return { start: (cb)=>cb&&cb() };
+    let i=0, id=0; el.textContent='';
+    const tick = () => { if (i>=txt.length) return; el.textContent += txt.charAt(i++); id = setTimeout(tick, delay); };
+    return { start: (cb)=>{ tick(); setTimeout(()=>cb&&cb(), delay*txt.length+10); } };
   };
 
-  Boot();
+  // ---- Boot
+  const boot = () => {
+    // no-js
+    d.documentElement.classList.remove('no-js');
+
+    // Theme
+    Theme.init(); Theme.bind();
+
+    // Loading
+    addEventListener('load', Loading.ready);
+
+    // Starfield
+    if (Starfield.start) Starfield.start();
+
+    // Reveal / Spy / Smooth
+    RevealSpy.init();  Smooth.bind();
+
+    // Timeline
+    Timeline.bind();
+
+    // Skills
+    Skills.init();
+
+    // Intro typing (if elements exist)
+    if ($homeH1 && $homeP){
+      const t1 = Typewriter($homeH1, $homeH1.textContent.trim(), 26);
+      const t2 = Typewriter($homeP,  $homeP.textContent.trim(), 20);
+      t1.start(()=> t2.start(()=>{}));
+    }
+
+    // Footer year (supports both #year and #current-year)
+    const y = qs('#year') || qs('#current-year');
+    if (y) y.textContent = new Date().getFullYear();
+
+    // Reduced motion live changes
+    matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e)=>{
+      if (e.matches && $starWrap) $starWrap.style.display = 'none';
+      if (!e.matches && $starWrap) $starWrap.style.display = '';
+    });
+  };
+
+  // Start
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
