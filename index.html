@@ -37,21 +37,25 @@
   <!-- Background FX -->
   <canvas id="starfield" aria-hidden="true"></canvas>
 
-  <!-- Nav -->
-  <nav id="main-nav" aria-label="Primary">
-    <div class="nav-wrap">
-      <div class="logo">Daniel's Domain</div>
-      <div id="visitorCounter" class="visitor-pill">
-  Views: <span id="visitorCountNum">--</span>
-      <div class="spacer"></div>
-      <div class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#skills">Skills</a>
-        <a href="#gaming">Gaming</a>
-        <button id="themeToggle" aria-pressed="false" title="Toggle theme">🌙</button>
-      </div>
+<nav id="main-nav" aria-label="Main website navigation">
+  <div class="nav-wrap">
+    <div class="logo" aria-label="Daniel's Domain Logo">Daniel's Domain</div>
+
+    <!-- Counter pill lives here -->
+    <div id="visitorCounter" class="visitor-pill" aria-live="polite">
+      Views: <span id="visitorCountNum">--</span>
     </div>
-  </nav>
+
+    <div class="spacer"></div>
+
+    <div class="nav-links">
+      <a href="#home" data-link>Home</a>
+      <a href="#skills" data-link>Skills</a>
+      <a href="#gaming" data-link>Gaming</a>
+      <button class="theme-toggle" id="themeToggle" aria-pressed="false" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</nav>
 
 <!-- Vinyl + HUD -->
 <button id="vinylToggle" class="vinyl" aria-label="Play music" aria-pressed="false">
@@ -152,6 +156,7 @@
   <script defer src="music.js"></script> <!-- keep last -->
   </body>
 </html>
+
 
 
 
