@@ -4,236 +4,193 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <title>Daniel's Digital Domain — Black · White · Red</title>
-  <meta name="description" content="Daniel's portfolio — accomplishments, skills, gaming profiles, and socials. Minimal, fast, accessible." />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://example.com/" />
-
-  <!-- Theme colors (light/dark aware) -->
+  <title>Daniel's Digital Domain</title>
+  <meta name="description" content="Sleek, minimal, red/black personal site — Home, Skills, Gaming." />
+  <meta name="robots" content="index,follow" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
 
-  <!-- Icons -->
-  <link rel="icon" href="images/Tab.ico" sizes="any" />
-  <link rel="icon" type="image/png" href="images/icon-192.png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
-
-  <!-- Social cards -->
-  <meta property="og:title" content="Daniel's Digital Domain" />
-  <meta property="og:description" content="Accomplishments • Skills • Gaming & Socials" />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="images/TrackerPFP.jpg" />
-  <meta property="og:site_name" content="Daniel's Digital Domain" />
-  <meta name="twitter:card" content="summary_large_image" />
-
-  <!-- Fonts -->
+  <link rel="icon" href="images/Tab.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Design System Stylesheet (from the CSS overhaul you approved) -->
-  <link rel="stylesheet" href="ui-overhaul.css" />
+  <style>
+    :root{
+      --bg:#000;--bg2:#0f0f0f;--bg3:#171717;--text:#eaeaea;--muted:#b4b4b4;--edge:#2a2a2a;
+      --red:#ff1a1a;--red-2:#ff3b3b;--red-d:#c40000;--ring: 0 0 0 2px rgba(255,0,0,.45);
+      --radius:14px;--shadow:0 10px 30px rgba(0,0,0,.5);
+    }
+    [data-theme="light"]{ --bg:#ffffff;--bg2:#f5f5f5;--bg3:#ececec;--text:#0e0e0e;--muted:#4a4a4a;--edge:#d6d6d6;--red:#e00000;--red-2:#ff2e2e;--red-d:#b60000; }
 
-  <!-- Critical enhancements for no‑JS users -->
-  <noscript>
-    <style>
-      .loading{ display:none !important; }
-      .section>.content{ opacity:1 !important; transform:none !important; }
-    </style>
-  </noscript>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,rgba(255,0,0,.06),transparent 60%),
+                     radial-gradient(1000px 600px at -10% 10%,rgba(255,255,255,.04),transparent 60%),var(--bg);
+         color:var(--text);font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;line-height:1.6;min-height:100dvh;}
+    .sr-only{position:absolute!important;width:1px;height:1px;clip:rect(1px,1px,1px,1px);overflow:hidden}
 
-  <!-- Structured data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Daniel",
-    "url": "https://example.com/",
-    "sameAs": [
-      "https://x.com/DanielWitSwag",
-      "https://discord.gg/aVapJsJu",
-      "https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview"
-    ],
-    "jobTitle": "Developer / Designer"
-  }
-  </script>
+    /* Loading */
+    #loading{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:9999;transition:opacity .35s ease}
+    #loading.hidden{opacity:0;pointer-events:none}
+    .spinner{width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:var(--red);animation:spin .9s linear infinite}
+    .loading__text{margin-top:10px;color:var(--muted);font-weight:600;letter-spacing:.4px}
+    .loading__dots::after{content:"";animation:dots 1.1s infinite steps(4,end)}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes dots{0%{content:"."}33%{content:".."}66%{content:"..."}100%{content:""}}
+
+    /* Starfield */
+    #starfield{position:fixed;inset:0;z-index:-1;display:block}
+
+    /* Nav */
+    #main-nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(120%) blur(8px);
+      background:color-mix(in oklab,var(--bg),transparent 45%);border-bottom:1px solid var(--edge)}
+    .nav-wrap{max-width:1100px;margin:auto;padding:10px 16px;display:flex;gap:14px;align-items:center}
+    .logo{font-weight:800;letter-spacing:.4px;background:linear-gradient(90deg,#fff,var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .spacer{flex:1}
+    .nav-links{display:flex;gap:8px;align-items:center}
+    .nav-links a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--muted);
+      font-weight:700;padding:8px 12px;border-radius:999px;transition:background .18s ease,color .18s ease,transform .18s ease}
+    .nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--text);background:rgba(255,0,0,.12)}
+    #themeToggle{border:1px solid var(--edge);background:var(--bg3);color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer}
+
+    /* Sections */
+    .section{padding:90px 16px}
+    .center{max-width:1100px;margin:auto}
+
+    /* Hero */
+    .hero{min-height:66dvh;display:grid;place-items:center;text-align:center;gap:16px}
+    .hero h1{font-size:clamp(34px,6vw,64px);margin:0;font-weight:800;letter-spacing:.3px;text-shadow:0 0 26px rgba(255,0,0,.18)}
+    .hero p{margin:0;color:var(--muted)}
+    .cta{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;border:1px solid var(--edge);
+      background:var(--bg3);color:var(--text);text-decoration:none;font-weight:800;box-shadow:var(--shadow);transition:transform .15s ease,background .2s ease}
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{background:linear-gradient(90deg,var(--red),var(--red-2));color:#080808;border:0}
+
+    /* Card shell */
+    .shell{background:linear-gradient(180deg,color-mix(in oklab,var(--bg2),#000 4%),color-mix(in oklab,var(--bg2),#000 14%));
+      border:1px solid var(--edge);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+
+    /* Skills */
+    .skills{display:grid;gap:12px}
+    .skills .row{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center}
+    .skills .label{font-weight:700}
+    .track{height:12px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;position:relative;border:1px solid var(--edge)}
+    .fill{position:absolute;inset:0 auto 0 0;width:0%;background:linear-gradient(90deg,var(--red),#fff);border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+    .skills code{font-family:'Fira Code',monospace;color:var(--muted)}
+
+    /* Gaming */
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+    .card{display:block;text-decoration:none;color:inherit}
+    .card .img{aspect-ratio:16/10;border-radius:var(--radius);overflow:hidden;border:1px solid var(--edge);background:#0c0c0c;position:relative}
+    .card img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.98) contrast(1.04)}
+    .card .title{margin:.55rem 0 0;font-weight:800}
+    .card .brand{color:var(--muted);font-size:.92rem}
+    .card:hover .img::after{content:"Open";position:absolute;inset:auto 8px 8px auto;background:var(--bg3);border:1px solid var(--edge);padding:6px 10px;border-radius:999px;font:700 12px Poppins}
+
+    /* Footer */
+    footer{margin-top:40px;padding:26px 16px;border-top:1px solid var(--edge);color:var(--muted)}
+    .footer-links{display:flex;gap:10px;flex-wrap:wrap}
+    .footer-links a{color:var(--muted);text-decoration:none;border:1px solid var(--edge);padding:8px 12px;border-radius:12px}
+
+    /* Scroll progress */
+    [data-scroll-progress]{position:fixed;left:0;top:54px;height:2px;width:0;background:var(--red);box-shadow:0 0 6px rgba(255,0,0,.5);z-index:100}
+
+    @media (max-width:768px){
+      .skills .row{grid-template-columns:100px 1fr}
+      [data-scroll-progress]{top:64px}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+      #loading{display:none!important}
+    }
+  </style>
 </head>
 <body>
-  <!-- Skip link -->
   <a class="sr-only" href="#home">Skip to content</a>
 
-  <!-- Loading overlay -->
-  <div class="loading" id="loading" role="status" aria-live="polite" aria-atomic="true">
+  <div id="loading" role="status" aria-live="polite" aria-atomic="true">
     <div class="spinner" aria-hidden="true"></div>
     <div class="loading__text">Loading <span class="loading__dots"></span></div>
   </div>
 
-  <!-- Background field -->
-  <div class="starfield" aria-hidden="true"></div>
+  <canvas id="starfield" aria-hidden="true"></canvas>
 
-  <!-- Top Nav -->
-  <header class="nav" role="banner">
-    <a class="nav__brand" href="#home" aria-label="Daniel's Domain">Daniel's Domain</a>
-    <nav aria-label="Primary">
-      <ul class="nav__list">
-        <li><a class="nav__link" data-link href="#home">Home</a></li>
-        <li><a class="nav__link" data-link href="#accomplishments">Accomplishments</a></li>
-        <li><a class="nav__link" data-link href="#skills">Skills</a></li>
-        <li><a class="nav__link" data-link href="#gaming">Gaming</a></li>
-      </ul>
-    </nav>
-    <button class="theme-toggle" id="themeToggle" aria-pressed="false" title="Toggle theme">🌙</button>
-  </header>
+  <nav id="main-nav" aria-label="Primary">
+    <div class="nav-wrap">
+      <div class="logo">Daniel's Domain</div>
+      <div class="spacer"></div>
+      <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#skills">Skills</a>
+        <a href="#gaming">Gaming</a>
+        <button id="themeToggle" aria-pressed="false" title="Toggle theme">🌙</button>
+      </div>
+    </div>
+  </nav>
 
-  <!-- HERO ------------------------------------------------------------------ -->
-  <section id="home" class="section" role="region" aria-labelledby="home-h">
-    <div class="content hero" data-animate>
-      <h1 id="home-h">Welcome to Daniel's Digital Domain</h1>
-      <p class="max-read center">Still under construction — but the core systems are live. Explore what’s shipped and come back for more drops.</p>
-      <div class="stack" style="--sp-sm:1rem; margin-top: .75rem;">
-        <p><a href="#accomplishments" class="nav__link" data-underline>View Accomplishments</a></p>
-        <p><a href="#gaming" class="nav__link" data-underline>Gaming & Socials</a></p>
+  <section id="home" class="section">
+    <div class="center hero">
+      <h1>Welcome to Daniel's Digital Domain</h1>
+      <p>Minimal. Fast. Red/Black. Built for focus and flow.</p>
+      <div class="cta">
+        <a class="btn primary" href="#skills">View Skills</a>
+        <a class="btn" href="#gaming">Gaming & Socials</a>
       </div>
     </div>
   </section>
 
-  <!-- ACCOMPLISHMENTS ------------------------------------------------------- -->
-  <section id="accomplishments" class="section" role="region" aria-labelledby="acc-h">
-    <div class="content" data-animate>
-      <h2 id="acc-h">Accomplishments</h2>
-      <p class="max-read center">Pivotal moments that shaped the craft.</p>
-
-      <div class="timeline" id="timeline">
-        <!-- 2020 -->
-        <article class="timeline__item" data-year="2020" tabindex="0" aria-current="false">
-          <div class="timeline__card">
-            <h3>Certifications & Awards</h3>
-            <p>First programming certifications. Real inflection point.</p>
-          </div>
-        </article>
-        <!-- 2021 -->
-        <article class="timeline__item" data-year="2021" tabindex="0" aria-current="false">
-          <div class="timeline__card">
-            <h3>IGL — First FACEIT Win</h3>
-            <p>Took a Rainbow Six team to a tournament win while peaking on YouTube.</p>
-          </div>
-        </article>
-        <!-- 2022 -->
-        <article class="timeline__item" data-year="2022" tabindex="0" aria-current="false">
-          <div class="timeline__card">
-            <h3>Unfiltered Breakthrough</h3>
-            <p>Hard year. Necessary growth. Different output since.</p>
-          </div>
-        </article>
-        <!-- 2023 -->
-        <article class="timeline__item" data-year="2023" tabindex="0" aria-current="false">
-          <div class="timeline__card">
-            <h3>Freelance Programmer</h3>
-            <p>Open-source drops, GitHub growth, Discord community.</p>
-          </div>
-        </article>
-        <!-- 2024 -->
-        <article class="timeline__item" data-year="2024" tabindex="0" aria-current="false">
-          <div class="timeline__card">
-            <h3>Music — In Production</h3>
-            <p>Expanding into sound. Teasers coming.</p>
-          </div>
-        </article>
-        <!-- 2025 -->
-        <article class="timeline__item" data-year="2025" tabindex="0" aria-current="false">
-          <div class="timeline__card">
-            <h3>Next Up</h3>
-            <p>Flagship site, premium modules, cleaner brand system.</p>
-          </div>
-        </article>
-      </div>
-
-      <aside class="timeline__details" id="timelineDetails" aria-live="polite" aria-atomic="true">
-        <div>
-          <h3>Details</h3>
-          <p>Select a year to pin more info.</p>
-        </div>
-      </aside>
-    </div>
-  </section>
-
-  <!-- SKILLS ---------------------------------------------------------------- -->
-  <section id="skills" class="section" role="region" aria-labelledby="skills-h">
-    <div class="content" data-animate>
-      <h2 id="skills-h">My Skillset</h2>
-      <p class="max-read center">A transparent view of strengths. Bars animate on visibility.</p>
-
+  <section id="skills" class="section">
+    <div class="center shell">
+      <h2 style="margin:0 0 8px 0">Skillset</h2>
+      <p style="margin:0 0 16px 0;color:var(--muted)">Bars animate when visible. Numbers count up. Clean and honest.</p>
       <div class="skills" id="skillsList">
-        <div class="skills__row" data-level="98" data-label="Python">
-          <div class="skills__label">Python</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
-        <div class="skills__row" data-level="97" data-label="HTML">
-          <div class="skills__label">HTML</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
-        <div class="skills__row" data-level="95" data-label="CSS">
-          <div class="skills__label">CSS</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
-        <div class="skills__row" data-level="96" data-label="JavaScript">
-          <div class="skills__label">JavaScript</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
-        <div class="skills__row" data-level="92" data-label="C#">
-          <div class="skills__label">C#</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
-        <div class="skills__row" data-level="65" data-label="Go (Golang)">
-          <div class="skills__label">Go (Golang)</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
-        <div class="skills__row" data-level="62" data-label="Rust">
-          <div class="skills__label">Rust</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
-        <div class="skills__row" data-level="68" data-label="Kotlin">
-          <div class="skills__label">Kotlin</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
-        <div class="skills__row" data-level="45" data-label="Assembly">
-          <div class="skills__label">Assembly</div>
-          <div class="skills__track"><span class="skills__bar" style="--value:0%"></span></div>
-        </div>
+        <div class="row" data-level="98"><div class="label">Python</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>98%</code></div></div>
+        <div class="row" data-level="97"><div class="label">HTML</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>97%</code></div></div>
+        <div class="row" data-level="95"><div class="label">CSS</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>95%</code></div></div>
+        <div class="row" data-level="96"><div class="label">JavaScript</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>96%</code></div></div>
+        <div class="row" data-level="92"><div class="label">C#</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>92%</code></div></div>
+        <div class="row" data-level="65"><div class="label">Go</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>65%</code></div></div>
+        <div class="row" data-level="62"><div class="label">Rust</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>62%</code></div></div>
+        <div class="row" data-level="68"><div class="label">Kotlin</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>68%</code></div></div>
+        <div class="row" data-level="45"><div class="label">Assembly</div><div class="track"><span class="fill"></span></div><div style="grid-column:2/3"><code>45%</code></div></div>
       </div>
     </div>
   </section>
 
-  <!-- GAMING & SOCIALS ------------------------------------------------------ -->
-  <section id="gaming" class="section" role="region" aria-labelledby="gaming-h">
-    <div class="content" data-animate>
-      <h2 id="gaming-h">Gaming & Socials</h2>
-      <p class="max-read center">Browse profiles and connect.</p>
-
-      <div class="cards" role="list">
-        <a class="card" role="listitem" href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank" rel="noopener noreferrer" aria-label="R6 Tracker">
-          <img class="card__img" src="images/TrackerPFP.jpg" alt="R6 Tracker profile picture" loading="lazy" />
-          <div class="card__title">R6 Tracker</div>
+  <section id="gaming" class="section">
+    <div class="center shell">
+      <h2 style="margin:0 0 8px 0">Gaming & Socials</h2>
+      <p style="margin:0 0 16px 0;color:var(--muted)">Hover tilt, lazy images, and fast prefetch on hover.</p>
+      <div class="grid">
+        <a class="card" href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank" rel="noopener noreferrer">
+          <div class="img"><img loading="lazy" src="images/TrackerPFP.jpg" alt="R6 Tracker" /></div>
+          <div class="title">R6 Tracker</div>
+          <div class="brand">tracker.network</div>
         </a>
-        <a class="card" role="listitem" href="https://x.com/DanielWitSwag" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-          <img class="card__img" src="images/TwitterPFP.jpg" alt="Twitter profile picture" loading="lazy" />
-          <div class="card__title">X (Twitter)</div>
+        <a class="card" href="https://x.com/DanielWitSwag" target="_blank" rel="noopener noreferrer">
+          <div class="img"><img loading="lazy" src="images/TwitterPFP.jpg" alt="X / Twitter" /></div>
+          <div class="title">X (Twitter)</div>
+          <div class="brand">x.com</div>
         </a>
-        <a class="card" role="listitem" href="https://discord.gg/aVapJsJu" target="_blank" rel="noopener noreferrer" aria-label="Discord Server">
-          <img class="card__img" src="images/DiscordPFP.gif" alt="Discord animated logo" loading="lazy" />
-          <div class="card__title">Discord</div>
+        <a class="card" href="https://discord.gg/aVapJsJu" target="_blank" rel="noopener noreferrer">
+          <div class="img"><img loading="lazy" src="images/DiscordPFP.gif" alt="Discord" /></div>
+          <div class="title">Discord</div>
+          <div class="brand">discord.gg</div>
         </a>
-        <a class="card" role="listitem" href="https://open.spotify.com/user/YOUR_SPOTIFY_USERNAME" target="_blank" rel="noopener noreferrer" aria-label="Spotify Profile">
-          <img class="card__img" src="images/SpotifyPFP.jpg" alt="Spotify profile graphic" loading="lazy" />
-          <div class="card__title">Spotify</div>
+        <a class="card" href="https://open.spotify.com/user/YOUR_SPOTIFY_USERNAME" target="_blank" rel="noopener noreferrer">
+          <div class="img"><img loading="lazy" src="images/SpotifyPFP.jpg" alt="Spotify" /></div>
+          <div class="title">Spotify</div>
+          <div class="brand">open.spotify.com</div>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- FOOTER ---------------------------------------------------------------- -->
-  <footer class="footer" role="contentinfo">
-    <div class="social">
+  <footer class="center">
+    <div class="footer-links">
       <a href="https://r6.tracker.network/r6siege/profile/ubi/DanielWitSwag/overview" target="_blank" rel="noopener noreferrer">R6 Tracker</a>
       <a href="https://x.com/DanielWitSwag" target="_blank" rel="noopener noreferrer">X (Twitter)</a>
       <a href="https://discord.gg/aVapJsJu" target="_blank" rel="noopener noreferrer">Discord</a>
@@ -242,100 +199,29 @@
     <p>© <span id="year"></span> DanielWitSwag · All rights reserved.</p>
   </footer>
 
-  <!-- JS: tiny, framework-free, performance-aware -->
   <script>
-  (function(){
-    // 1) Remove no-js
-    document.documentElement.classList.remove('no-js');
-
-    // 2) Theme management
-    const KEY = 'dd-theme';
-    const prefersLight = matchMedia('(prefers-color-scheme: light)');
-    const get = () => localStorage.getItem(KEY);
-    const set = (v) => { document.documentElement.setAttribute('data-theme', v); localStorage.setItem(KEY, v); };
-    const init = () => { const s = get(); set(s ? s : (prefersLight.matches ? 'light' : 'dark')); };
-    init();
-    prefersLight.addEventListener('change', (e)=>{ if(!get()) set(e.matches ? 'light' : 'dark'); });
-
-    const themeBtn = document.getElementById('themeToggle');
-    const icon = () => document.documentElement.getAttribute('data-theme') === 'light' ? '🌞' : '🌙';
-    const pressed = () => document.documentElement.getAttribute('data-theme') !== 'light';
-    themeBtn.textContent = icon();
-    themeBtn.setAttribute('aria-pressed', pressed());
-    themeBtn.addEventListener('click', ()=>{
-      const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      set(next); themeBtn.textContent = icon(); themeBtn.setAttribute('aria-pressed', pressed());
-    });
-
-    // 3) Loading fade
-    window.addEventListener('load', ()=>{
-      const el = document.getElementById('loading');
-      el.setAttribute('hidden', '');
-    });
-
-    // 4) Year stamp
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // 5) Section reveal + nav spy
-    const links = Array.from(document.querySelectorAll('[data-link]'));
-    const sections = links.map(a => document.querySelector(a.getAttribute('href')));
-    const reveal = new IntersectionObserver((entries)=>{
-      for(const e of entries){
-        if(e.isIntersecting) e.target.classList.add('is-visible');
-      }
-    }, { rootMargin: '-15% 0px', threshold: 0.1 });
-
-    document.querySelectorAll('.section').forEach(s => reveal.observe(s));
-
-    const spy = new IntersectionObserver((entries)=>{
-      for(const e of entries){
-        if(!e.isIntersecting) continue;
-        links.forEach(l=> l.removeAttribute('aria-current'));
-        const id = '#' + e.target.id; const link = links.find(l => l.getAttribute('href') === id);
-        if(link) link.setAttribute('aria-current','page');
-      }
-    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0.01 });
-    sections.forEach(s => s && spy.observe(s));
-
-    // 6) Timeline pin
-    const details = document.getElementById('timelineDetails');
-    const more = {
-      2020: 'Stack: Lua, SQL, JavaScript. Early Git discipline. Won a local hack challenge; shipped two utilities used by a 500+ user community.',
-      2021: 'Led strats, VOD reviews, and mental game. Translated discipline into cleaner code reviews and shipping velocity.',
-      2022: 'Rebuilt priorities. Cut noise. Doubled down on UI/UX rigor and performance-first standards.',
-      2023: 'Shipped FiveM utilities, HUDs, and inventory prototypes. Added CI checks, semantic release, docs-as-code.',
-      2024: 'Learning composition → mixing → mastering. Ambient/industrial texture direction.',
-      2025: 'Flagship website, premium modules, unified brand system.'
-    };
-
-    document.getElementById('timeline').addEventListener('click', (e)=>{
-      const item = e.target.closest('.timeline__item');
-      if(!item) return;
-      document.querySelectorAll('.timeline__item[aria-current="true"]').forEach(i=> i.setAttribute('aria-current','false'));
-      item.setAttribute('aria-current','true');
-      const y = item.dataset.year; const title = item.querySelector('h3').textContent;
-      details.innerHTML = `<div><h3>${y} — ${title}</h3><p>${more[y]||''}</p></div>`;
-      details.classList.add('is-visible');
-    });
-
-    // Keyboard support for timeline items
-    document.querySelectorAll('.timeline__item').forEach(it => {
-      it.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); it.click(); } });
-    });
-
-    // 7) Skill bars
-    const skillIO = new IntersectionObserver((entries)=>{
-      for(const {isIntersecting, target} of entries){
-        if(!isIntersecting) continue;
-        const lvl = Number(target.dataset.level)||0;
-        const bar = target.querySelector('.skills__bar');
-        requestAnimationFrame(()=> bar.style.inlineSize = lvl + '%');
-        skillIO.unobserve(target);
-      }
-    }, { threshold: 0.35 });
-    document.querySelectorAll('.skills__row').forEach(r => skillIO.observe(r));
+  (()=>{'use strict';const d=document,w=window,DPR=w.devicePixelRatio||1;const qs=(s,r=d)=>r.querySelector(s),qsa=(s,r=d)=>Array.from(r.querySelectorAll(s));const isRM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;const raf=(f)=>requestAnimationFrame(f);const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
+  const $loading=qs('#loading');const $star=qs('#starfield');const $nav=qs('#main-nav');const $links=qsa('nav a[href^="#"], [data-link]');const $home=qs('#home');const $homeH1=qs('#home h1');const $homeP=qs('#home p');const $skills=qs('#skills');const $gaming=qs('#gaming');const $year=qs('#year')||qs('#current-year');
+  const Theme=(()=>{const KEY='dd-theme';const mql=matchMedia('(prefers-color-scheme: light)');const get=()=>localStorage.getItem(KEY);const apply=(m)=>d.documentElement.setAttribute('data-theme',m);const set=(m)=>{apply(m);localStorage.setItem(KEY,m)};const init=()=>apply(get()||(mql.matches?'light':'dark'));const bind=()=>{const b=qs('#themeToggle');const icon=()=>d.documentElement.getAttribute('data-theme')==='light'?'🌞':'🌙';if(b){b.textContent=icon();b.setAttribute('aria-pressed',d.documentElement.getAttribute('data-theme')!=='light');b.addEventListener('click',()=>{const next=d.documentElement.getAttribute('data-theme')==='light'?'dark':'light';set(next);b.textContent=icon();b.setAttribute('aria-pressed',next!=='light')});mql.addEventListener('change',e=>{if(!get())apply(e.matches?'light':'dark');b.textContent=icon()})}d.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='t'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();const next=d.documentElement.getAttribute('data-theme')==='light'?'dark':'light';set(next);if(b){b.textContent=icon();b.setAttribute('aria-pressed',next!=='light')}}})};return{init,bind}})();
+  const Loading=(()=>{const hide=()=>{$loading&&($loading.classList.add('hidden'),$loading.setAttribute('aria-hidden','true'))};const ready=()=>{$loading&&(isRM()?hide():setTimeout(hide,350))};return{ready}})();
+  const Progress=(()=>{let bar;const mount=()=>{if(qs('[data-scroll-progress]'))return;bar=d.createElement('div');bar.setAttribute('data-scroll-progress','');d.body.appendChild(bar);const place=()=>{bar.style.top=(($nav?$nav.offsetHeight:54))+'px'};place();const upd=()=>{const max=d.documentElement.scrollHeight-w.innerHeight;bar.style.width=(max>0?(w.scrollY/max)*100:0)+'%'};w.addEventListener('resize',()=>{place();upd()});w.addEventListener('scroll',upd,{passive:true});upd()};return{mount}})();
+  const Router=(()=>{const sections=['#home','#skills','#gaming'].map(id=>qs(id)).filter(Boolean);const revealIO=new IntersectionObserver(es=>{for(const e of es)if(e.isIntersecting)e.target.classList.add('is-visible')},{rootMargin:'-12% 0px',threshold:.08});const spyIO=new IntersectionObserver(es=>{for(const e of es){if(!e.isIntersecting)continue;$links.forEach(l=>l.removeAttribute('aria-current'));const id='#'+e.target.id;const a=$links.find(l=>l.getAttribute('href')===id);a&&a.setAttribute('aria-current','page')}},{rootMargin:'-45% 0px -50% 0px',threshold:.01});const smoothTo=(id)=>{const el=typeof id==='string'?qs(id):id;el&&el.scrollIntoView({behavior:'smooth',block:'start'})};d.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const id=a.getAttribute('href');if(!id||id.length<2)return;const el=qs(id);if(!el)return;e.preventDefault();smoothTo(id);history.replaceState(null,'',id)});const onHash=()=>{if(location.hash&&qs(location.hash))setTimeout(()=>smoothTo(location.hash),10)};sections.forEach(s=>{revealIO.observe(s);spyIO.observe(s)});onHash();addEventListener('hashchange',onHash);return{smoothTo}})();
+  const Starfield=(()=>{if(!$star||isRM())return{start:()=>{},stop:()=>{}};const ctx=$star.getContext('2d',{alpha:true});let W=0,H=0,stars=[],last=0,running=false;const SPEED=.18;const resize=()=>{W=Math.max(1,Math.floor(w.innerWidth*DPR));H=Math.max(1,Math.floor(w.innerHeight*DPR));$star.width=W;$star.height=H;$star.style.width=W/DPR+'px';$star.style.height=H/DPR+'px';const count=clamp(Math.floor((W/DPR)*(H/DPR)/9000),90,200);stars=new Array(count).fill(0).map(()=>({x:Math.random()*W,y:Math.random()*H,z:Math.random()*.8+.2,s:Math.random()*1.5+.2}))};const draw=(now)=>{if(!running)return;const dt=Math.min(34,now-(last||now));last=now;ctx.clearRect(0,0,W,H);for(let i=0;i<stars.length;i++){const st=stars[i];st.x+=st.z*SPEED*dt*DPR;if(st.x>W){st.x=0;st.y=Math.random()*H}ctx.fillStyle=`rgba(255,255,255,${.4+st.z*.6})`;ctx.fillRect(st.x,st.y,st.s*DPR,st.s*DPR)};raf(draw)};const start=()=>{resize();running=true;raf(draw)};addEventListener('resize',resize);matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{if(e.matches)running=false;else start()});return{start}})();
+  const Home=(()=>{let ticking=false;const type=(el,txt,delay=22)=>{if(!el||!txt||isRM())return;el.textContent='';let i=0;const step=()=>{if(i>=txt.length)return;el.textContent+=txt.charAt(i++);setTimeout(step,delay)};step()};const runType=()=>{if(!$homeH1||!$homeP||isRM())return;const h=$homeH1.textContent.trim(),p=$homeP.textContent.trim();type($homeH1,h,26);setTimeout(()=>type($homeP,p,18),Math.min(1200,20*h.length))};const parallax=(e)=>{if(isRM()||!$home)return;if(ticking)return;ticking=true;raf(()=>{const x=e.clientX/w.innerWidth-.5,y=e.clientY/w.innerHeight-.5;const tx=x*8,ty=y*6;$homeH1&&($homeH1.style.transform=`translate3d(${tx}px,${ty}px,0)`);$homeP&&($homeP.style.transform=`translate3d(${tx/2}px,${ty/2}px,0)`);ticking=false})};const topBtn=(()=>{let btn;const mount=()=>{if(qs('[data-backtop]'))return;btn=d.createElement('button');btn.setAttribute('data-backtop','');btn.setAttribute('title','Back to top (H)');btn.textContent='↑';Object.assign(btn.style,{position:'fixed',right:'16px',bottom:'16px',zIndex:'999',width:'44px',height:'44px',borderRadius:'999px',background:'var(--bg3)',color:'var(--text)',border:'1px solid var(--edge)',cursor:'pointer',opacity:'0',transform:'translateY(10px)',transition:'opacity .2s ease, transform .2s ease'});btn.addEventListener('click',()=>Router.smoothTo('#home'));d.body.appendChild(btn);addEventListener('scroll',()=>{const show=scrollY>innerHeight*.75;btn.style.opacity=show?'1':'0';btn.style.transform=show?'translateY(0)':'translateY(10px)'},{passive:true})};return{mount}})();const keys=()=>{d.addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key.toLowerCase();if(k==='h'){e.preventDefault();Router.smoothTo('#home')}if(k==='s'){e.preventDefault();Router.smoothTo('#skills')}if(k==='g'){e.preventDefault();Router.smoothTo('#gaming')}})};const init=()=>{runType();addEventListener('pointermove',parallax);topBtn.mount();keys()};return{init}})();
+  const Skills=(()=>{if(!$skills)return{init:()=>{}};const rows=qsa('.row',$skills);const getLvl=(r)=>clamp(Number(r.dataset.level||0),0,100);const inc=(el,to,ms=600)=>{if(!el)return;const from=Number(el.textContent.replace('%',''))||0;const st=performance.now();const step=(t)=>{const k=clamp((t-st)/ms,0,1);el.textContent=Math.round(from+(to-from)*k)+'%';if(k<1)raf(step)};raf(step)};const io=new IntersectionObserver((es,obs)=>{for(const {isIntersecting,target} of es){if(!isIntersecting)continue;const lvl=getLvl(target);const bar=target.querySelector('.fill');const code=target.querySelector('code');if(bar){bar.style.transition='width 900ms cubic-bezier(.2,.9,.2,1)';bar.style.width=lvl+'%'}if(code)inc(code,lvl,700);target.setAttribute('aria-valuenow',String(lvl));obs.unobserve(target)}},{threshold:.35});const init=()=>rows.forEach(r=>io.observe(r));return{init}})();
+  const Gaming=(()=>{if(!$gaming)return{init:()=>{}};const tiles=qsa('.card',$gaming);const imgs=qsa('img[loading="lazy"]',$gaming);const lqIO=new IntersectionObserver((es,obs)=>{for(const {isIntersecting,target} of es){if(!isIntersecting)continue;target.decode?.().catch(()=>null).finally(()=>target.classList.add('is-loaded'));obs.unobserve(target)}},{rootMargin:'200px 0px',threshold:.01});const tilt=(el)=>{if(isRM())return;let id=0;const move=(e)=>{cancelAnimationFrame(id);id=raf(()=>{const r=el.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;const rx=clamp(-y*8,-8,8),ry=clamp(x*12,-12,12);el.querySelector('.img').style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`})};const reset=()=>{el.querySelector('.img').style.transform='perspective(900px) rotateX(0) rotateY(0)'};el.addEventListener('pointermove',move);el.addEventListener('pointerleave',reset);el.addEventListener('blur',reset)};const prefetch=(a)=>{const href=a.getAttribute('href');if(!href||href.startsWith('#'))return;let hinted=false;const hint=()=>{if(hinted)return;hinted=true;const l=d.createElement('link');l.rel='prefetch';l.href=href;d.head.appendChild(l)};a.addEventListener('pointerenter',hint,{passive:true});a.addEventListener('focus',hint,{passive:true})};const init=()=>{imgs.forEach(i=>lqIO.observe(i));tiles.forEach(tilt);tiles.forEach(prefetch)};return{init}})();
+  d.documentElement.classList.remove('no-js');
+  Theme.init();Theme.bind();
+  addEventListener('load',Loading.ready);
+  (()=>{if(qs('[data-scroll-progress]'))return;const bar=d.createElement('div');bar.setAttribute('data-scroll-progress','');d.body.appendChild(bar);const place=()=>bar.style.top=(($nav?$nav.offsetHeight:54))+'px';place();const upd=()=>{const max=d.documentElement.scrollHeight-innerHeight;bar.style.width=(max>0?(scrollY/max)*100:0)+'%'};addEventListener('resize',()=>{place();upd()});addEventListener('scroll',upd,{passive:true});upd()})();
+  Starfield.start();
+  Home.init();
+  Skills.init();
+  Gaming.init();
+  const a=qsa('nav a[href^="#"], [data-link]');const secs=a.map(x=>qs(x.getAttribute('href'))).filter(Boolean);const rIO=new IntersectionObserver(es=>{for(const e of es)if(e.isIntersecting)e.target.classList.add('is-visible')},{rootMargin:'-12% 0px',threshold:.08});const sIO=new IntersectionObserver(es=>{for(const e of es){if(!e.isIntersecting)continue;a.forEach(l=>l.removeAttribute('aria-current'));const id='#'+e.target.id;const link=a.find(l=>l.getAttribute('href')===id);link&&link.setAttribute('aria-current','page')}},{rootMargin:'-45% 0px -50% 0px',threshold:.01});secs.forEach(s=>{rIO.observe(s);sIO.observe(s)});
+  const onHash=()=>{if(location.hash&&qs(location.hash))setTimeout(()=>{qs(location.hash).scrollIntoView({behavior:'smooth',block:'start'})},10)};onHash();addEventListener('hashchange',onHash);
+  if($year)$year.textContent=new Date().getFullYear();
   })();
   </script>
 </body>
 </html>
-
