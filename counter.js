@@ -1,5 +1,5 @@
 (() => {
-    const seed = 1729;
+    const seed = 3729;
     const cpu = navigator.hardwareConcurrency || 6;
     const timeKey = Math.floor(Date.now() / 86400000) % 9;
 
