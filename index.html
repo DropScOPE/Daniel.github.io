@@ -16,15 +16,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Root-level CSS (no /assets prefix) -->
-  <link rel="stylesheet" href="functions.css" />
-  <link rel="stylesheet" href="page.css" />
-  <link rel="stylesheet" href="hero.css" />
-  <link rel="stylesheet" href="skills.css" />
-  <link rel="stylesheet" href="gaming.css" />
-  <link rel="stylesheet" href="music.css" />
-</head>
-<body>
+  <link rel="stylesheet" href="functions.css">
+  <link rel="stylesheet" href="page.css">
+  <link rel="stylesheet" href="hero.css">
+  <link rel="stylesheet" href="skills.css">
+  <link rel="stylesheet" href="gaming.css">
+  <link rel="stylesheet" href="music.css"> <!-- keep last -->
+  </head>
+<body>  
+    
   <a class="sr-only" href="#home">Skip to content</a>
 
   <!-- Loading -->
@@ -50,20 +50,24 @@
     </div>
   </nav>
 
-<!-- Music HUD (glass card) -->
-<div id="musicHud" class="music-hud" aria-hidden="true">
-  <div class="hud-row hud-title">
-    <span id="hudTitle">track.mp3</span>
+<!-- Vinyl + HUD -->
+<button id="vinylToggle" class="vinyl" aria-label="Play music" aria-pressed="false">
+  <img src="images/Vynl.png" alt="" width="512" height="512" />
+</button>
+<div class="music-hud" id="musicHud" role="region" aria-label="Music controls">
+  <div class="hud-row"><span class="hud-title" id="hudTitle">track.mp3</span></div>
+  <div class="hud-row"><span id="hudTime">0:00 / 0:00</span>
+    <input id="hudSeek" class="hud-seek" type="range" min="0" max="1" step="0.001" value="0">
   </div>
-  <div class="hud-row">
-    <span id="hudTime">0:00 / 0:00</span>
-    <input id="hudSeek" class="hud-seek" type="range" min="0" max="1" step="0.001" value="0" aria-label="Seek">
-  </div>
-  <div class="hud-row">
-    <span>Vol</span>
-    <input id="hudVol" class="hud-vol" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
+  <div class="hud-row"><span>Vol</span>
+    <input id="hudVol" class="hud-vol" type="range" min="0" max="1" step="0.01" value="0.85">
   </div>
 </div>
+
+<audio id="bgm" preload="auto" crossorigin="anonymous">
+  <source src="music/track.mp3" type="audio/mpeg">
+</audio>
+
 
   
   <!-- HOME -->
@@ -136,15 +140,15 @@
     <p>© <span id="year"></span> DanielWitSwag · All rights reserved.</p>
   </footer>
 
-  <!-- Root-level JS (no /assets prefix) -->
-  <script src="functions.js" defer></script>
-  <script src="hero.js" defer></script>
-  <script src="skills.js" defer></script>
-  <script src="gaming.js" defer></script>
-  <script src="music.js" defer></script>
-  <script src="page.js" defer></script>
-</body>
+  <script defer src="functions.js"></script>
+  <script defer src="page.js"></script>
+  <script defer src="hero.js"></script>
+  <script defer src="skills.js"></script>
+  <script defer src="gaming.js"></script>
+  <script defer src="music.js"></script> <!-- keep last -->
+  </body>
 </html>
+
 
 
 
