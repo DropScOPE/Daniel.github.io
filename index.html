@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="hero.css" />
   <link rel="stylesheet" href="skills.css" />
   <link rel="stylesheet" href="gaming.css" />
+  <link rel="stylesheet" href="music.css" />
 </head>
 <body>
   <a class="sr-only" href="#home">Skip to content</a>
@@ -48,6 +49,20 @@
     </div>
   </nav>
 
+<!-- Background Music -->
+<audio id="bgm" preload="auto" crossorigin="anonymous">
+  <!-- SET YOUR FILE HERE: update src to match a file in /music -->
+  <source src="music/track.mp3" type="audio/mpeg" />
+  <!-- e.g., music/lofi.mp3 or music/anything.mp3 -->
+</audio>
+
+<!-- Vinyl Play/Pause Button -->
+<button id="vinylToggle" class="vinyl" aria-pressed="false" aria-label="Play background music" title="Play/Pause (M)">
+  <img src="images/Vynl.png" alt="" draggable="false" />
+  <span class="vinyl-ring" aria-hidden="true"></span>
+</button>
+
+  
   <!-- HOME -->
   <section id="home" class="section">
     <div class="center hero">
@@ -126,3 +141,4 @@
   <script src="page.js" defer></script>
 </body>
 </html>
+
