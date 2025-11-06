@@ -1,129 +1,55 @@
-/* ===== Vinyl + HUD — premium red/black glass ===== */
-:root{
-  --vinyl-size: 70px;
-  --vinyl-pad : 7px;
-  --vinyl-ring: 6px;
-  --p: 0deg; /* progress angle (JS) */
-}
-
-/* Floating vinyl button */
-#vinylToggle.vinyl{
+/* One-button music control (vinyl) */
+.vinyl{
   position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 900;
-  width: var(--vinyl-size);
-  height: var(--vinyl-size);
-  border-radius: 999px;
-  border: 1px solid var(--edge);
-  background: linear-gradient(180deg, #141414, #0b0b0b);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-  box-shadow: 0 10px 30px rgba(0,0,0,.45);
-  user-select: none;
-  outline: none;
+  right: 18px;
+  bottom: 18px;
+  z-index: 60;
+
+  display:inline-grid;
+  place-items:center;
+
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  padding:0;
+
+  background:rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.55),
+    0 0 0 1px rgba(255,0,0,.22) inset;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  cursor:pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
 }
 
-/* Red progress ring with conic gradient */
-#vinylToggle.vinyl::before{
-  content:"";
-  position:absolute;
-  inset: -2px;
-  border-radius: 999px;
-  background:
-    conic-gradient(#ff2a2a var(--p), rgba(255,255,255,.10) 0),
-    radial-gradient(circle at 50% 50%, rgba(255,0,0,.10), transparent 55%);
-  -webkit-mask:
-    radial-gradient(circle calc(50% - var(--vinyl-ring)) at 50% 50%, transparent 98%, #000 100%);
-          mask:
-    radial-gradient(circle calc(50% - var(--vinyl-ring)) at 50% 50%, transparent 98%, #000 100%);
-  filter: drop-shadow(0 0 10px rgba(255,0,0,.14));
+.vinyl:hover{ transform: translateY(-1px); }
+.vinyl:active{ transform: translateY(0); }
+
+.vinyl img{
+  width: 48px; height: 48px; display:block; pointer-events:none;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.45));
+  transform: translateZ(0);
 }
 
-/* Inner disc (your image) */
-#vinylToggle.vinyl img{
-  width: calc(var(--vinyl-size) - var(--vinyl-pad)*2);
-  height: calc(var(--vinyl-size) - var(--vinyl-pad)*2);
-  border-radius: 50%;
-  display: block;
-  pointer-events: none;
-  filter: drop-shadow(0 0 10px rgba(255,0,0,.18));
-  transform-origin: 50% 50%;
-  animation: vinyl-spin 3.6s linear infinite;
-  animation-play-state: paused;
+/* Spinning only when audio is playing */
+.vinyl.is-playing img{
+  animation: spin 2.8s linear infinite;
 }
 
-#vinylToggle.vinyl:hover{
-  transform: translateY(-1px);
-  border-color: rgba(255,0,0,.45);
-  box-shadow: 0 12px 36px rgba(255,0,0,.18), 0 10px 30px rgba(0,0,0,.5);
-}
-#vinylToggle.vinyl:focus-visible{ outline: 2px solid rgba(255,0,0,.6) }
-#vinylToggle.vinyl.is-playing img{ animation-play-state: running; }
-
-@keyframes vinyl-spin{ to{ transform: rotate(360deg) } }
-
-/* ===== Glass HUD ===== */
-.music-hud{
-  position: fixed;
-  right: calc(16px + var(--vinyl-size) + 12px);
-  bottom: 16px;
-  width: clamp(260px, 35vw, 380px);
-  backdrop-filter: blur(10px) saturate(125%);
-  -webkit-backdrop-filter: blur(10px) saturate(125%);
-  background: color-mix(in oklab, #0b0b0b, black 12%);
-  border: 1px solid var(--edge);
-  border-radius: 14px;
-  padding: 12px;
-  color: #e9e9e9;
-  box-shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,0,0,.10);
-  display: grid;
-  gap: 10px;
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-  transition: opacity .18s ease, transform .18s ease;
-  z-index: 890;
-}
-.music-hud.is-open{ opacity: 1; transform: translateY(0); pointer-events: auto; }
-
-.hud-row{ display:flex; align-items:center; gap:12px; font-size: 13px; color:#cfcfcf; }
-.hud-title{ font-weight:800; color:#fff; letter-spacing:.2px; }
-
-#hudTime{ font-variant-numeric: tabular-nums; color:#bdbdbd }
-
-/* Sliders */
-.hud-seek, .hud-vol{
-  -webkit-appearance: none; appearance: none;
-  flex:1; height: 6px; border-radius: 999px;
-  background: rgba(255,255,255,.10);
-  outline: none; border: 1px solid var(--edge);
-}
-.hud-vol{ max-width: 160px; }
-
-.hud-seek::-webkit-slider-thumb,
-.hud-vol::-webkit-slider-thumb{
-  -webkit-appearance: none; appearance: none;
-  width: 16px; height: 16px; border-radius: 50%;
-  background: #ff2a2a; border: 0; cursor: pointer;
-  box-shadow: 0 0 10px rgba(255,42,42,.35);
-}
-.hud-seek::-moz-range-thumb,
-.hud-vol::-moz-range-thumb{
-  width: 16px; height: 16px; border: 0; border-radius: 50%;
-  background: #ff2a2a; cursor: pointer;
+@keyframes spin{
+  to{ transform: rotate(360deg); }
 }
 
-/* Hover proximity opens HUD */
-#vinylToggle.vinyl:hover + .music-hud,
-#vinylToggle.vinyl:focus + .music-hud,
-.music-hud:hover{ opacity: 1; transform: translateY(0); pointer-events: auto; }
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .vinyl.is-playing img{ animation:none; }
+}
 
-/* Mobile tweak */
-@media (max-width: 480px){
-  :root{ --vinyl-size: 60px; }
-  #vinylToggle.vinyl{ right: 12px; bottom: 12px; }
-  .music-hud{ right: 12px; bottom: calc(12px + var(--vinyl-size) + 10px); width: min(90vw, 360px); }
+/* Small screens – slightly bigger tap target (still desktop-friendly) */
+@media (max-width: 540px){
+  .vinyl{ width:72px; height:72px; }
+  .vinyl img{ width:56px; height:56px; }
 }
