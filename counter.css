@@ -1,0 +1,13 @@
+.visitor-pill{
+  color:#fff;
+  background:rgba(255,0,0,.18);
+  border:1px solid rgba(255,0,0,.45);
+  padding:6px 16px;
+  border-radius:50px;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.4px;
+  user-select:none;
+  backdrop-filter:blur(6px);
+  box-shadow:0 0 6px rgba(255,0,0,.35);
+}
