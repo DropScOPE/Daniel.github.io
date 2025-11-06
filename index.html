@@ -50,18 +50,20 @@
     </div>
   </nav>
 
-<!-- Background Music -->
-<audio id="bgm" preload="auto" crossorigin="anonymous">
-  <!-- SET YOUR FILE HERE: update src to match a file in /music -->
-  <source src="music/track.mp3" type="audio/mpeg" />
-  <!-- e.g., music/lofi.mp3 or music/anything.mp3 -->
-</audio>
-
-<!-- Vinyl Play/Pause Button -->
-<button id="vinylToggle" class="vinyl" aria-pressed="false" aria-label="Play background music" title="Play/Pause (M)">
-  <img src="images/Vynl.png" alt="" draggable="false" />
-  <span class="vinyl-ring" aria-hidden="true"></span>
-</button>
+<!-- Music HUD (glass card) -->
+<div id="musicHud" class="music-hud" aria-hidden="true">
+  <div class="hud-row hud-title">
+    <span id="hudTitle">track.mp3</span>
+  </div>
+  <div class="hud-row">
+    <span id="hudTime">0:00 / 0:00</span>
+    <input id="hudSeek" class="hud-seek" type="range" min="0" max="1" step="0.001" value="0" aria-label="Seek">
+  </div>
+  <div class="hud-row">
+    <span>Vol</span>
+    <input id="hudVol" class="hud-vol" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
+  </div>
+</div>
 
   
   <!-- HOME -->
@@ -143,5 +145,6 @@
   <script src="page.js" defer></script>
 </body>
 </html>
+
 
 
