@@ -1,88 +1,171 @@
-/* Daniel's Digital Domain — Compatibility JS (110%)
-   Maps old HTML structure to the new engine, so no HTML edits are needed.
-   - Works with: #loading-screen, #starfield canvas, #timeline, .timeline-item,
-                 #timeline-details, .skill-progress[data-skill], nav#main-nav a, etc.
-   - Adds: theme toggle persistence, reveal/spy, HiDPI starfield, smoother timeline,
-           skill bar animation, reduced-motion safety.
-*/
+/* ===========================================================================
+   Daniel's Digital Domain — 3-Section JS (Home / Skills / Gaming)
+   Drop-in, zero-deps, a11y-first, motion-safe, perf-tuned.
+   Assumes sections: #home, #skills, #gaming. No Accomplishments.
+   Features:
+   - Theme manager (persist + system aware) + hotkey (T)
+   - Loading gate (fast) + reduced-motion compliance
+   - HiDPI starfield on #starfield canvas
+   - Section reveal, nav spy, smooth hash scroll, hash router
+   - Home: typewriter intro, subtle parallax, back-to-top affordance
+   - Skills: bar animation + live number counter + rerun on hash navigation
+   - Gaming: lazy image loader, hover tilt (motion-safe), prefetch on hover
+   - Utility: scroll progress bar under nav, keyboard shortcuts (H/S/G)
+   =========================================================================== */
 (() => {
   'use strict';
 
-  // ---- DOM helpers
+  // ---------- DOM helpers
   const d = document, w = window, DPR = w.devicePixelRatio || 1;
   const qs  = (s, r=d) => r.querySelector(s);
   const qsa = (s, r=d) => Array.from(r.querySelectorAll(s));
   const isRM = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // ---- Selectors: support BOTH new + your current HTML
-  const $loading     = qs('#loading') || qs('#loading-screen');
-  const $starCanvas  = qs('canvas#starfield');         // your existing canvas
-  const $starWrap    = $starCanvas || qs('.starfield'); // either canvas or container
-  const $homeH1      = qs('#home .content h1') || qs('#home h1');
-  const $homeP       = qs('#home .content p') || qs('#home p');
-  const $timeline    = qs('#timeline');
-  const $timelineDet = qs('#timelineDetails') || qs('#timeline-details');
-  const $skillsRows  = qsa('.skills__row'); // new
-  const $skillBars   = qsa('.skill-progress, .skills__bar'); // your old + new
-  const $sections    = qsa('section');
-  const $navLinks    = qsa('nav#main-nav a[href^="#"], [data-link]');
-
-  // ---- Utilities
-  const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
   const raf = (fn) => requestAnimationFrame(fn);
+  const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
 
-  // ---- Theme
-  const Theme = (()=> {
+  // ---------- Selectors (3 sections only)
+  const $loading   = qs('#loading') || qs('#loading-screen');
+  const $star      = qs('#starfield');                  // canvas
+  const $nav       = qs('#main-nav') || qs('header.nav');
+  const $links     = qsa('nav a[href^="#"], [data-link]');
+  const $home      = qs('#home');
+  const $homeH1    = qs('#home h1');
+  const $homeP     = qs('#home p');
+  const $skills    = qs('#skills');
+  const $gaming    = qs('#gaming');
+  const $year      = qs('#year') || qs('#current-year');
+
+  // ---------- Theme
+  const Theme = (() => {
     const KEY = 'dd-theme';
     const mql = matchMedia('(prefers-color-scheme: light)');
     const get = () => localStorage.getItem(KEY);
-    const apply = (m) => d.documentElement.setAttribute('data-theme', m);
-    const set = (m) => { apply(m); localStorage.setItem(KEY, m); };
+    const apply = (mode) => d.documentElement.setAttribute('data-theme', mode);
+    const set = (mode) => { apply(mode); localStorage.setItem(KEY, mode); };
     const init = () => apply(get() || (mql.matches ? 'light' : 'dark'));
     const bind = () => {
       const btn = qs('#themeToggle');
-      if (!btn) return;
       const icon = () => d.documentElement.getAttribute('data-theme') === 'light' ? '🌞' : '🌙';
-      btn.textContent = icon();
-      btn.addEventListener('click', ()=>{
-        const next = d.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-        set(next); btn.textContent = icon(); btn.setAttribute('aria-pressed', next !== 'light');
+      if (btn) {
+        btn.textContent = icon();
+        btn.setAttribute('aria-pressed', d.documentElement.getAttribute('data-theme') !== 'light');
+        btn.addEventListener('click', () => {
+          const next = d.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          set(next); btn.textContent = icon(); btn.setAttribute('aria-pressed', next !== 'light');
+        });
+        mql.addEventListener('change', (e)=>{ if(!get()) apply(e.matches ? 'light' : 'dark'); btn.textContent = icon(); });
+      }
+      // Hotkey (T) for theme toggle
+      d.addEventListener('keydown', (e)=>{
+        if (e.key.toLowerCase() === 't' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+          e.preventDefault();
+          const next = d.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          set(next); if (btn) { btn.textContent = icon(); btn.setAttribute('aria-pressed', next !== 'light'); }
+        }
       });
-      mql.addEventListener('change', e => { if (!get()) apply(e.matches ? 'light' : 'dark'); btn.textContent = icon(); });
     };
     return { init, bind };
   })();
 
-  // ---- Loading gate (respects both ids)
-  const Loading = (()=> {
+  // ---------- Loading gate
+  const Loading = (() => {
     const hide = () => { if ($loading) { $loading.classList.add('hidden'); $loading.setAttribute('aria-hidden','true'); } };
-    const ready = () => {
-      if (!$loading) return;
-      if (isRM()) { hide(); return; }
-      // min 400ms gate for smoother feel; yours was 3s – not necessary.
-      setTimeout(hide, 400);
-    };
+    const ready = () => { if (!$loading) return; isRM() ? hide() : setTimeout(hide, 350); };
     return { ready };
   })();
 
-  // ---- Starfield (HiDPI). Works on existing <canvas id="starfield">
-  const Starfield = (()=> {
-    if (!$starWrap || isRM()) return { start:()=>{}, stop:()=>{} };
-    const canvas = $starCanvas || d.createElement('canvas');
-    if (!$starCanvas) $starWrap.appendChild(canvas);
+  // ---------- Scroll progress (under nav)
+  const ScrollProgress = (() => {
+    let bar;
+    const mount = () => {
+      if (qs('[data-scroll-progress]')) return;
+      bar = d.createElement('div');
+      bar.setAttribute('data-scroll-progress','');
+      Object.assign(bar.style, {
+        position:'fixed', left:'0', top: ($nav ? ($nav.offsetHeight + 'px') : '0'),
+        height:'2px', width:'0%', zIndex:'999',
+        background:'var(--brand, #ff3333)', boxShadow:'0 0 6px rgba(255,0,0,.5)'
+      });
+      d.body.appendChild(bar);
+      update();
+      w.addEventListener('scroll', update, { passive:true });
+      w.addEventListener('resize', ()=> {
+        if ($nav) bar.style.top = $nav.offsetHeight + 'px';
+        update();
+      });
+    };
+    const update = () => {
+      const max = d.documentElement.scrollHeight - w.innerHeight;
+      const pct = max > 0 ? (w.scrollY / max) * 100 : 0;
+      if (bar) bar.style.width = `${pct}%`;
+    };
+    return { mount };
+  })();
 
-    const ctx = canvas.getContext('2d', { alpha:true });
+  // ---------- Smooth scroll + hash router + nav spy + reveal
+  const Router = (() => {
+    const sections = ['#home','#skills','#gaming'].map(id=>qs(id)).filter(Boolean);
+    const revealIO = new IntersectionObserver((entries)=>{
+      for (const e of entries) if (e.isIntersecting) e.target.classList.add('is-visible');
+    }, { rootMargin:'-12% 0px', threshold:0.08 });
+
+    const spyIO = new IntersectionObserver((entries)=>{
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        $links.forEach(l => l.removeAttribute('aria-current'));
+        const id = '#' + e.target.id;
+        const a  = $links.find(l => l.getAttribute('href') === id);
+        if (a) a.setAttribute('aria-current','page');
+      }
+    }, { rootMargin:'-45% 0px -50% 0px', threshold:0.01 });
+
+    const smoothTo = (id) => {
+      const el = typeof id === 'string' ? qs(id) : id;
+      if (!el) return;
+      el.scrollIntoView({ behavior:'smooth', block:'start' });
+    };
+
+    const onClick = (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute('href');
+      if (!id || id.length < 2) return;
+      const el = qs(id);
+      if (!el) return;
+      e.preventDefault();
+      smoothTo(id);
+      history.replaceState(null,'',id);
+    };
+
+    const onHashLoad = () => {
+      if (location.hash && qs(location.hash)) {
+        setTimeout(()=> smoothTo(location.hash), 10);
+      }
+    };
+
+    const init = () => {
+      d.addEventListener('click', onClick);
+      sections.forEach(s => { revealIO.observe(s); spyIO.observe(s); });
+      onHashLoad();
+      w.addEventListener('hashchange', onHashLoad);
+    };
+    return { init, smoothTo };
+  })();
+
+  // ---------- Starfield (HiDPI)
+  const Starfield = (() => {
+    if (!$star || isRM()) return { start:()=>{}, stop:()=>{} };
+    const ctx = $star.getContext('2d', { alpha:true });
     let W=0, H=0, stars=[], last=0, running=false;
     const SPEED = 0.18;
 
     const resize = () => {
-      const rect = ($starCanvas ? canvas : $starWrap).getBoundingClientRect();
-      W = Math.max(1, Math.floor(rect.width * DPR));
-      H = Math.max(1, Math.floor((w.innerHeight || rect.height) * DPR));
-      canvas.width = W; canvas.height = H;
-      canvas.style.width = `${W/DPR}px`; canvas.style.height = `${H/DPR}px`;
-      const count = clamp(Math.floor((W/DPR)*(H/DPR)/9000), 80, 180);
-      stars = new Array(count).fill(0).map(()=>({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8+0.2, s: Math.random()*1.5+0.2 }));
+      W = Math.max(1, Math.floor(w.innerWidth * DPR));
+      H = Math.max(1, Math.floor(w.innerHeight * DPR));
+      $star.width = W; $star.height = H;
+      $star.style.width = `${W/DPR}px`; $star.style.height = `${H/DPR}px`;
+      const count = clamp(Math.floor((W/DPR)*(H/DPR)/9000), 90, 200);
+      stars = new Array(count).fill(0).map(()=>({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2, s: Math.random()*1.5 + 0.2 }));
     };
 
     const draw = (now) => {
@@ -106,169 +189,226 @@
     return { start, stop };
   })();
 
-  // ---- Reveal + nav spy (works with your anchors)
-  const RevealSpy = (()=> {
-    const links = $navLinks;
-    const sections = links.map(a => qs(a.getAttribute('href'))).filter(Boolean);
+  // ---------- Home: typewriter + parallax + back-to-top
+  const Home = (() => {
+    let tidH=0, tidP=0, ticking=false;
+    const type = (el, txt, delay=22) => {
+      if (!el || !txt || isRM()) return;
+      el.textContent = '';
+      let i=0;
+      const tick = () => {
+        if (i >= txt.length) return;
+        el.textContent += txt.charAt(i++);
+        tidH = setTimeout(tick, delay);
+      };
+      tick();
+    };
+    const typePair = () => {
+      if (!$homeH1 || !$homeP || isRM()) return;
+      const hTxt = $homeH1.textContent.trim();
+      const pTxt = $homeP.textContent.trim();
+      type($homeH1, hTxt, 26);
+      setTimeout(()=> type($homeP, pTxt, 18), Math.min(1200, 20*hTxt.length));
+    };
+    const parallax = (e) => {
+      if (isRM() || !$home) return;
+      if (ticking) return (void 0);
+      ticking = true;
+      raf(()=> {
+        const { clientX:x, clientY:y } = e;
+        const cx = x / w.innerWidth  - 0.5;
+        const cy = y / w.innerHeight - 0.5;
+        const tx = cx * 8, ty = cy * 6; // subtle
+        if ($homeH1) $homeH1.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        if ($homeP)  $homeP.style.transform  = `translate3d(${tx/2}px, ${ty/2}px, 0)`;
+        ticking = false;
+      });
+    };
+    // back-to-top button
+    const Top = (() => {
+      let btn;
+      const mount = () => {
+        if (qs('[data-backtop]')) return;
+        btn = d.createElement('button');
+        btn.setAttribute('data-backtop','');
+        btn.setAttribute('title','Back to top (H)');
+        btn.textContent = '↑';
+        Object.assign(btn.style, {
+          position:'fixed', right:'16px', bottom:'16px', zIndex:'999',
+          width:'44px', height:'44px', borderRadius:'999px',
+          background:'var(--bg-elev, rgba(255,255,255,.08))',
+          color:'var(--text, #fff)', border:'1px solid rgba(255,255,255,.12)',
+          cursor:'pointer', opacity:'0', transform:'translateY(10px)', transition:'opacity .2s ease, transform .2s ease'
+        });
+        btn.addEventListener('click', () => Router.smoothTo('#home'));
+        d.body.appendChild(btn);
+        w.addEventListener('scroll', () => {
+          const show = w.scrollY > (w.innerHeight * 0.75);
+          btn.style.opacity = show ? '1' : '0';
+          btn.style.transform = show ? 'translateY(0)' : 'translateY(10px)';
+        }, { passive:true });
+      };
+      return { mount };
+    })();
 
-    const revealIO = new IntersectionObserver(entries => {
-      for (const e of entries) if (e.isIntersecting) e.target.classList.add('visible','is-visible');
-    }, { rootMargin: '-12% 0px', threshold: 0.08 });
-
-    const spyIO = new IntersectionObserver(entries => {
-      for (const e of entries){
-        if (!e.isIntersecting) continue;
-        links.forEach(l => l.removeAttribute('aria-current'));
-        const id = '#' + e.target.id;
-        const a = links.find(l => l.getAttribute('href') === id);
-        if (a) a.setAttribute('aria-current','page');
-      }
-    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0.01 });
+    const keys = () => {
+      d.addEventListener('keydown', (e)=>{
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const k = e.key.toLowerCase();
+        if (k === 'h') { e.preventDefault(); Router.smoothTo('#home'); }
+        if (k === 's') { e.preventDefault(); Router.smoothTo('#skills'); }
+        if (k === 'g') { e.preventDefault(); Router.smoothTo('#gaming'); }
+      });
+    };
 
     const init = () => {
-      qsa('.section, section').forEach(s => revealIO.observe(s));
-      sections.forEach(s => spyIO.observe(s));
+      typePair();
+      w.addEventListener('pointermove', parallax);
+      Top.mount();
+      keys();
     };
     return { init };
   })();
 
-  // ---- Smooth anchor scroll (offsetless; your CSS already uses scroll-padding)
-  const Smooth = (()=> {
-    const onClick = (e) => {
-      const a = e.target.closest('a[href^="#"]'); if (!a) return;
-      const id = a.getAttribute('href'); if (!id || id.length < 2) return;
-      const el = qs(id); if (!el) return;
-      e.preventDefault();
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      history.replaceState(null,'',id);
-    };
-    const bind = () => d.addEventListener('click', onClick);
-    return { bind };
-  })();
-
-  // ---- Timeline controller (supports your .timeline-item structure)
-  const Timeline = (()=> {
-    if (!$timeline) return { bind:()=>{} };
-    const map = {
-      2020: 'Stack: Lua, SQL, JavaScript. Early Git discipline. Won a local hack challenge; shipped two utilities used by a 500+ user community.',
-      2021: 'Led strats, VOD reviews, and mental game. Discipline → cleaner code reviews, faster shipping.',
-      2022: 'Rebuilt priorities. Cut noise. Doubled down on UI/UX rigor and perf-first standards.',
-      2023: 'Dropped FiveM utilities, HUDs, inventory prototypes. CI checks, semantic release, docs-as-code.',
-      2024: 'Learning composition → mixing → mastering. Ambient/industrial textures.',
-      2025: 'Flagship site, premium modules, unified brand system.'
-    };
-    const items = qsa('.timeline__item, .timeline-item, #timeline .card[aria-expanded]');
-
-    const extractTitle = (el) => (el.querySelector('h3') && el.querySelector('h3').textContent) || el.getAttribute('data-title') || 'Details';
-    const extractYear  = (el) => el.dataset.year || el.getAttribute('data-year') || (el.querySelector('.pill')?.textContent?.trim()) || '';
-
-    const activate = (it) => {
-      items.forEach(i => i.setAttribute('aria-current','false'));
-      it.setAttribute('aria-current','true');
-      const y = extractYear(it), t = extractTitle(it);
-      if ($timelineDet){
-        // If your HTML already renders inner details, prefer that
-        const inner = it.querySelector('.timeline-content, .details');
-        $timelineDet.innerHTML = inner ? inner.innerHTML : `<h3>${y} — ${t}</h3><p>${map[y]||''}</p>`;
-        $timelineDet.classList.add('visible','is-visible');
+  // ---------- Skills: animate bars + increment numbers
+  const Skills = (() => {
+    if (!$skills) return { init:()=>{} };
+    const rows = qsa('.skills__row, .skill, .skill-progress', $skills);
+    const getLevel = (row) => {
+      // Prefer data-level on row; fallback to data-skill/aria-valuenow/code% patterns
+      let lvl = Number(row.dataset.level || row.dataset.skill || row.getAttribute('aria-valuenow') || 0);
+      if (!lvl) {
+        const code = row.querySelector('code')?.textContent?.replace('%','');
+        lvl = Number(code||0);
       }
+      return clamp(lvl, 0, 100);
     };
-
-    const bind = () => {
-      $timeline.addEventListener('click', (e) => {
-        const it = e.target.closest('.timeline__item, .timeline-item, #timeline .card[aria-expanded]');
-        if (!it) return;
-        // support old cards that toggle aria-expanded
-        if (it.hasAttribute('aria-expanded')) {
-          const exp = it.getAttribute('aria-expanded') === 'true';
-          qsa('#timeline .card[aria-expanded]').forEach(c => c.setAttribute('aria-expanded','false'));
-          it.setAttribute('aria-expanded', String(!exp));
-        }
-        activate(it);
-      });
-      items.forEach(it => it.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(it); }}));
+    const inc = (el, to, ms=600) => {
+      if (!el) return;
+      const from = Number(el.textContent.replace('%','')) || 0;
+      const start = performance.now();
+      const step = (t) => {
+        const k = clamp((t - start) / ms, 0, 1);
+        const v = Math.round(from + (to - from) * k);
+        el.textContent = v + '%';
+        if (k < 1) raf(step);
+      };
+      raf(step);
     };
-    return { bind };
-  })();
-
-  // ---- Skills animator (supports .skill-progress[data-skill])
-  const Skills = (()=> {
-    const rows = $skillsRows.length ? $skillsRows : qsa('.skill, .skill-progress[aria-valuenow], .skill-progress[data-skill]');
     const io = new IntersectionObserver((entries, obs)=>{
       for (const { isIntersecting, target } of entries) {
         if (!isIntersecting) continue;
-        const bar = target.matches('.skill-progress') ? target : target.querySelector('.skills__bar, .bar > span, .skill-progress');
-        if (!bar) { obs.unobserve(target); continue; }
-        // level extraction (prefer data-skill, then aria-valuenow, then inner code %)
-        const container = target.matches('.skill-progress') ? target : target.closest('.skill') || target;
-        let lvl = Number(container?.dataset?.skill || bar?.dataset?.skill || container?.getAttribute('aria-valuenow') || 0);
-        if (!lvl) {
-          const code = (container.querySelector('code')?.textContent || '').replace('%','');
-          lvl = Number(code||0);
+        const lvl = getLevel(target);
+        const bar = target.querySelector('.skills__bar, .bar > span, .skill-progress');
+        const label = target.querySelector('code');
+        if (bar) {
+          bar.style.transition = 'inline-size 900ms cubic-bezier(.2,.9,.2,1), width 900ms cubic-bezier(.2,.9,.2,1)';
+          // support width or inline-size depending on CSS
+          bar.style.inlineSize = lvl + '%';
+          bar.style.width = lvl + '%';
         }
-        lvl = clamp(lvl, 0, 100);
-        // old structure: CSS uses --skill-width on .skill-progress
-        if (bar.classList.contains('skill-progress')) bar.style.setProperty('--skill-width', lvl + '%');
-        // new structure: width on .skills__bar or .bar>span
-        bar.style.width = lvl + '%';
-        container.setAttribute('aria-valuenow', String(lvl));
+        if (label) inc(label, lvl, 700);
+        target.setAttribute('aria-valuenow', String(lvl));
         obs.unobserve(target);
       }
-    }, { threshold: .35 });
+    }, { threshold:.35 });
+
     const init = () => rows.forEach(r => io.observe(r));
     return { init };
   })();
 
-  // ---- Typewriter intro (safe if content exists; respects reduced motion)
-  const Typewriter = (el, txt, delay=22) => {
-    if (!el || !txt || isRM()) return { start: (cb)=>cb&&cb() };
-    let i=0, id=0; el.textContent='';
-    const tick = () => { if (i>=txt.length) return; el.textContent += txt.charAt(i++); id = setTimeout(tick, delay); };
-    return { start: (cb)=>{ tick(); setTimeout(()=>cb&&cb(), delay*txt.length+10); } };
-  };
+  // ---------- Gaming: lazy images + tilt + prefetch
+  const Gaming = (() => {
+    if (!$gaming) return { init:()=>{} };
+    const tiles = qsa('.tile, .card, a[rel~="noopener"][target="_blank"]', $gaming);
 
-  // ---- Boot
-  const boot = () => {
-    // no-js
+    // Lazy images
+    const imgs = qsa('img[loading="lazy"], .tile img, .card__img', $gaming);
+    const lqIO = new IntersectionObserver((entries, obs)=>{
+      for (const { isIntersecting, target } of entries){
+        if (!isIntersecting) continue;
+        const src = target.getAttribute('data-src') || target.getAttribute('src');
+        if (src) {
+          // force reload to ensure decode (works for data-src)
+          if (target.hasAttribute('data-src')) target.src = target.getAttribute('data-src');
+          target.decode?.().catch(()=>null).finally(()=> target.classList.add('is-loaded'));
+        }
+        obs.unobserve(target);
+      }
+    }, { rootMargin:'200px 0px', threshold:0.01 });
+
+    // Hover tilt (safe for reduced motion)
+    const tiltBind = (el) => {
+      if (isRM()) return;
+      let rAF = 0;
+      const onMove = (e) => {
+        cancelAnimationFrame(rAF);
+        rAF = raf(()=> {
+          const rect = el.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top)  / rect.height - 0.5;
+          const rx = clamp(-y * 8, -8, 8);
+          const ry = clamp( x * 12, -12, 12);
+          el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+        });
+      };
+      const reset = () => { el.style.transform = 'perspective(800px) rotateX(0) rotateY(0) translateZ(0)'; };
+      el.addEventListener('pointermove', onMove);
+      el.addEventListener('pointerleave', reset);
+      el.addEventListener('blur', reset);
+    };
+
+    // Prefetch on hover (anchors only)
+    const prefetchBind = (a) => {
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#')) return;
+      let hinted = false;
+      const hint = () => {
+        if (hinted) return; hinted = true;
+        const l = d.createElement('link');
+        l.rel = 'prefetch'; l.href = href; d.head.appendChild(l);
+      };
+      a.addEventListener('pointerenter', hint, { passive:true });
+      a.addEventListener('focus', hint, { passive:true });
+    };
+
+    const init = () => {
+      imgs.forEach(img => lqIO.observe(img));
+      tiles.forEach(tiltBind);
+      tiles.forEach(preview => prefetchBind(preview));
+    };
+    return { init };
+  })();
+
+  // ---------- Boot
+  const Boot = () => {
+    // Remove no-js
     d.documentElement.classList.remove('no-js');
 
     // Theme
     Theme.init(); Theme.bind();
 
-    // Loading
-    addEventListener('load', Loading.ready);
+    // Loading gate
+    w.addEventListener('load', Loading.ready);
+
+    // Progress bar
+    ScrollProgress.mount();
+
+    // Router (reveal + spy + smooth + hash)
+    Router.init();
 
     // Starfield
-    if (Starfield.start) Starfield.start();
+    Starfield.start();
 
-    // Reveal / Spy / Smooth
-    RevealSpy.init();  Smooth.bind();
-
-    // Timeline
-    Timeline.bind();
-
-    // Skills
+    // Home, Skills, Gaming
+    Home.init();
     Skills.init();
+    Gaming.init();
 
-    // Intro typing (if elements exist)
-    if ($homeH1 && $homeP){
-      const t1 = Typewriter($homeH1, $homeH1.textContent.trim(), 26);
-      const t2 = Typewriter($homeP,  $homeP.textContent.trim(), 20);
-      t1.start(()=> t2.start(()=>{}));
-    }
-
-    // Footer year (supports both #year and #current-year)
-    const y = qs('#year') || qs('#current-year');
-    if (y) y.textContent = new Date().getFullYear();
-
-    // Reduced motion live changes
-    matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e)=>{
-      if (e.matches && $starWrap) $starWrap.style.display = 'none';
-      if (!e.matches && $starWrap) $starWrap.style.display = '';
-    });
+    // Footer year
+    if ($year) $year.textContent = new Date().getFullYear();
   };
 
-  // Start
-  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', Boot);
+  else Boot();
 })();
