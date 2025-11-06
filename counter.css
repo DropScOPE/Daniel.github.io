@@ -11,3 +11,54 @@
   backdrop-filter:blur(6px);
   box-shadow:0 0 6px rgba(255,0,0,.35);
 }
+/* Layout: keep counter independent of nav-links’ styling */
+nav#main-nav .nav-wrap{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+/* Counter pill – compact and not stretching the header */
+.visitor-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  height:32px;
+  padding:0 14px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:.3px;
+  color:#fff;
+
+  background:rgba(255,0,0,.14);
+  border:1px solid rgba(255,0,0,.45);
+  box-shadow:0 2px 10px rgba(255,0,0,.18), inset 0 0 0 1px rgba(255,255,255,.04);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+
+  white-space:nowrap;
+  user-select:none;
+}
+
+/* Don’t let the counter pick up nav link hover styles */
+nav#main-nav .nav-links .visitor-pill{ all:unset; } /* safety if misplaced */
+
+/* Keep theme toggle aligned even when counter is present */
+nav#main-nav .nav-links{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* Responsive: wrap header on small screens and shrink the pill */
+@media (max-width: 768px){
+  nav#main-nav .nav-wrap{ flex-wrap:wrap; gap:10px; }
+  .visitor-pill{
+    order:3;              /* push below links on wrap */
+    font-size:12px;
+    height:28px;
+    padding:0 10px;
+    margin-top:6px;
+  }
+}
