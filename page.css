@@ -1,3 +1,9 @@
+:root{
+  --edge: rgba(255,255,255,.08);
+  --bg3: #111;
+}
+
+
 #main-nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(120%) blur(8px);
   background:color-mix(in oklab,var(--bg),transparent 45%);border-bottom:1px solid var(--edge)}
 .nav-wrap{max-width:1100px;margin:auto;padding:10px 16px;display:flex;gap:14px;align-items:center}
