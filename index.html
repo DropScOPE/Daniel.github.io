@@ -57,19 +57,16 @@
   </div>
 </nav>
 
-<!-- Vinyl + HUD -->
-<button id="vinylToggle" class="vinyl" aria-label="Play music" aria-pressed="false">
+<!-- Vinyl toggle (single control) -->
+<button id="vinylToggle" class="vinyl" aria-label="Play / Pause" aria-pressed="false">
   <img src="images/Vynl.png" alt="" width="512" height="512" />
 </button>
-<div class="music-hud" id="musicHud" role="region" aria-label="Music controls">
-  <div class="hud-row"><span class="hud-title" id="hudTitle">track.mp3</span></div>
-  <div class="hud-row"><span id="hudTime">0:00 / 0:00</span>
-    <input id="hudSeek" class="hud-seek" type="range" min="0" max="1" step="0.001" value="0">
-  </div>
-  <div class="hud-row"><span>Vol</span>
-    <input id="hudVol" class="hud-vol" type="range" min="0" max="1" step="0.01" value="0.85">
-  </div>
-</div>
+
+<!-- Hidden audio (no controls) -->
+<audio id="bgm" preload="auto" crossorigin="anonymous">
+  <source src="music/track.mp3" type="audio/mpeg">
+</audio>
+
 
 <audio id="bgm" preload="auto" crossorigin="anonymous">
   <source src="music/track.mp3" type="audio/mpeg">
@@ -156,6 +153,7 @@
   <script defer src="music.js"></script> <!-- keep last -->
   </body>
 </html>
+
 
 
 
