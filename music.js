@@ -1,34 +1,51 @@
 // Simple vinyl toggle: click = play/pause; resume from last position
-(() => {
+document.addEventListener('DOMContentLoaded', () => {
   const vinylBtn = document.getElementById('vinylToggle');
-  const audio = document.getElementById('bgm');
+  const audio    = document.getElementById('bgm');
 
-  if (!vinylBtn || !audio) return;
+  if (!vinylBtn || !audio) {
+    console.error('[music] Missing #vinylToggle or #bgm in DOM.');
+    return;
+  }
 
-  // Set your default volume here (kept constant; no on-page controls)
+  // Default volume (no on-page controls)
   const DEFAULT_VOL = 0.85;
   audio.volume = DEFAULT_VOL;
 
-  // Toggle UI state helper
+  // Helpful diagnostics if the file can’t load
+  audio.addEventListener('error', (e) => {
+    console.error('[music] Audio error:', e, 'src=', audio.currentSrc || '(no src)');
+  });
+
   const setPlayingUI = (isPlaying) => {
     vinylBtn.classList.toggle('is-playing', isPlaying);
     vinylBtn.setAttribute('aria-pressed', String(isPlaying));
   };
 
-  // Play with policy-safe handling
   const safePlay = () =>
-    audio.play().then(() => setPlayingUI(true)).catch(() => {
-      // If autoplay policy blocks, do nothing visible.
-      setPlayingUI(false);
-    });
+    audio.play()
+      .then(() => setPlayingUI(true))
+      .catch((err) => {
+        console.warn('[music] play() was blocked or failed:', err?.message || err);
+        setPlayingUI(false);
+      });
 
   const toggle = () => (audio.paused ? safePlay() : (audio.pause(), setPlayingUI(false)));
 
-  // Mouse / touch
+  // Click/tap handlers (pointerup catches some devices that swallow click)
   vinylBtn.addEventListener('click', toggle);
-
-  // Prevent long-press context menu from feeling janky on touch
+  vinylBtn.addEventListener('pointerup', toggle);
   vinylBtn.addEventListener('contextmenu', (e) => e.preventDefault());
 
-  // Reflect state when audio ends or pauses
-  audio.addEventListener('pause', ()
+  // Keep UI in sync if state changes elsewhere
+  audio.addEventListener('play',  () => setPlayingUI(true));
+  audio.addEventListener('pause', () => setPlayingUI(false));
+  audio.addEventListener('ended', () => setPlayingUI(false));
+
+  // Prewarm after first user gesture to avoid slow first play
+  const unlock = () => {
+    try { audio.load(); } catch {}
+    window.removeEventListener('pointerdown', unlock, { passive: true });
+  };
+  window.addEventListener('pointerdown', unlock, { passive: true });
+});
