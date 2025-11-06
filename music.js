@@ -1,8 +1,7 @@
-// Enhanced background music: progress ring, HUD, seek, volume, wheel-to-volume, long-press mute.
+// Smooth WebAudio BGM: soft fades, ring progress, HUD seek/vol, wheel-volume, long-press mute, Media Session.
 (() => {
   'use strict';
   const d = document, $ = (s,r=d)=>r.querySelector(s);
-
   const audio = $('#bgm');
   const btn   = $('#vinylToggle');
   const hud   = $('#musicHud');
@@ -10,157 +9,176 @@
   const elTime  = $('#hudTime');
   const seek    = $('#hudSeek');
   const vol     = $('#hudVol');
-
   if (!audio || !btn || !hud) return;
 
-  // ---- Config / state
-  const K_TIME = 'dd-bgm-time';
-  const K_PLAY = 'dd-bgm-playing';
-  const K_VOL  = 'dd-bgm-volume';
-  const RM_MQ  = matchMedia('(prefers-reduced-motion: reduce)');
+  // ---------- Persistent keys
+  const K_TIME='dd-bgm-time', K_PLAY='dd-bgm-playing', K_VOL='dd-bgm-volume';
 
-  // init title from current source
-  const src = (audio.currentSrc || audio.src || $('source', audio)?.src || '').split('/').pop() || 'track';
-  elTitle.textContent = decodeURIComponent(src);
+  // ---------- WebAudio graph (for click-free fades)
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const src = ctx.createMediaElementSource(audio);
+  const gain = ctx.createGain();
+  gain.gain.value = 0.0; // start silent; we’ll fade in on play
+  src.connect(gain).connect(ctx.destination);
 
-  // restore volume
-  const storedVol = Number(localStorage.getItem(K_VOL));
-  audio.volume = Number.isFinite(storedVol) ? Math.min(1, Math.max(0, storedVol)) : 0.8;
-  vol.value = String(audio.volume);
-
-  // restore time + pending resume
-  try {
-    const t = parseFloat(localStorage.getItem(K_TIME));
-    if (!Number.isNaN(t) && t > 0) audio.currentTime = t;
-  } catch {}
-  let resumePending = localStorage.getItem(K_PLAY) === '1';
-
-  // ---- Helpers
+  // helpers
+  const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
   const fmt = s => {
     if (!Number.isFinite(s)) return '0:00';
     s = Math.max(0, Math.floor(s));
     const m = Math.floor(s/60), r = s%60;
     return `${m}:${String(r).padStart(2,'0')}`;
   };
-  const setPlayUI = (playing) => {
-    btn.classList.toggle('is-playing', playing && !RM_MQ.matches);
-    btn.setAttribute('aria-pressed', String(playing));
-    btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
-    btn.title = playing ? 'Pause (M)' : 'Play (M)';
-    hud.classList.toggle('is-open', playing); // auto-open HUD while playing
+  const now = () => ctx.currentTime || audio.currentTime || 0;
+
+  // ---------- Restore state
+  const srcName = (audio.currentSrc || audio.src || $('source',audio)?.src || '').split('/').pop() || 'track.mp3';
+  elTitle.textContent = decodeURIComponent(srcName);
+
+  const savedVol = Number(localStorage.getItem(K_VOL));
+  audio.volume = clamp(Number.isFinite(savedVol) ? savedVol : 0.85, 0, 1);
+  vol.value = String(audio.volume);
+
+  try {
+    const t = parseFloat(localStorage.getItem(K_TIME));
+    if (!Number.isNaN(t) && t>0) audio.currentTime = t;
+  } catch {}
+  let resumePending = localStorage.getItem(K_PLAY) === '1';
+
+  // ---------- UI update
+  const setRing = () => {
+    const p = (audio.currentTime/(audio.duration||1))*360;
+    btn.style.setProperty('--p', `${isFinite(p)?p:0}deg`);
   };
-  const setProgressRing = () => {
-    const p = (audio.currentTime / (audio.duration || 1)) * 360;
-    // CSS conic progress
-    btn.style.setProperty('--p', `${isFinite(p) ? p : 0}deg`);
-  };
-  const updateTimeUI = () => {
+  const setTime = () => {
     elTime.textContent = `${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
-    // keep slider in sync (avoid dragging conflict)
-    if (!seek.matches(':active')) seek.value = String((audio.currentTime || 0) / (audio.duration || 1));
+    if (!seek.matches(':active')) seek.value = String((audio.currentTime||0)/(audio.duration||1));
+  };
+  const setPlayingUI = (playing) => {
+    const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    btn.classList.toggle('is-playing', playing && !rm);
+    btn.setAttribute('aria-pressed', String(playing));
+    btn.title = playing ? 'Pause (M)' : 'Play (M)';
+    btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
+    hud.classList.toggle('is-open', playing);
   };
 
-  // ---- Play/pause core
+  // ---------- Gain ramp (no clicks)
+  const rampTo = (value, dur=0.18) => {
+    const t = now();
+    gain.gain.cancelScheduledValues(t);
+    gain.gain.setValueAtTime(gain.gain.value, t);
+    gain.gain.linearRampToValueAtTime(clamp(value,0,1), t + dur);
+  };
+
+  // ---------- Playback control
   const play = async () => {
-    try {
+    try{
+      if (ctx.state !== 'running') await ctx.resume();
       await audio.play();
+      rampTo(audio.volume, 0.22);
       localStorage.setItem(K_PLAY,'1');
-      setPlayUI(true);
-      ticker.start();
-    } catch(e){ /* gesture required, ignore */ }
+      ticker.start(); setPlayingUI(true);
+    }catch(e){ /* user gesture needed; ignore */ }
   };
   const pause = () => {
-    audio.pause();
+    rampTo(0.0, 0.18);
+    setTimeout(()=> audio.pause(), 190); // pause after fade-out
     localStorage.setItem(K_PLAY,'0');
-    setPlayUI(false);
-    ticker.stop();
-    try { localStorage.setItem(K_TIME, String(audio.currentTime||0)); } catch {}
+    ticker.stop(); setPlayingUI(false);
+    try{ localStorage.setItem(K_TIME, String(audio.currentTime||0)); }catch{}
   };
 
-  // ---- Ticker (progress + save time)
-  const ticker = (() => {
+  // ---------- Global ticker (progress + autosave)
+  const ticker = (()=> {
     let id=0, lastSave=0;
     const step = (t) => {
-      setProgressRing(); updateTimeUI();
-      if (!lastSave || t - lastSave > 2000){
-        try { localStorage.setItem(K_TIME, String(audio.currentTime||0)); } catch {}
+      setRing(); setTime();
+      if (!lastSave || t-lastSave>1800){
+        try{ localStorage.setItem(K_TIME, String(audio.currentTime||0)); }catch{}
         lastSave = t;
       }
       id = requestAnimationFrame(step);
     };
-    const start = () => { if(id) return; id = requestAnimationFrame(step); };
-    const stop  = () => { if(id){ cancelAnimationFrame(id); id=0; } };
-    return { start, stop };
+    return {
+      start(){ if(!id) id = requestAnimationFrame(step); },
+      stop(){ if(id){ cancelAnimationFrame(id); id=0; } }
+    };
   })();
 
-  // ---- Events
-  btn.addEventListener('click', () => audio.paused ? play() : pause());
+  // ---------- Event wiring
+  btn.addEventListener('click', ()=> audio.paused ? play() : pause());
 
-  // Wheel over vinyl or HUD to change volume
+  // wheel-to-volume on vinyl/HUD
   const wheelVol = (e) => {
     e.preventDefault();
-    const delta = (e.deltaY || e.wheelDelta) > 0 ? -0.05 : 0.05;
-    audio.volume = Math.min(1, Math.max(0, audio.volume + delta));
+    const delta = (e.deltaY||e.wheelDelta) > 0 ? -0.05 : 0.05;
+    audio.volume = clamp(audio.volume + delta, 0, 1);
     vol.value = String(audio.volume);
-    try { localStorage.setItem(K_VOL, String(audio.volume)); } catch {}
+    try{ localStorage.setItem(K_VOL, String(audio.volume)); }catch{}
+    if (!audio.paused) rampTo(audio.volume, 0.12); // smooth adjust while playing
   };
   btn.addEventListener('wheel', wheelVol, { passive:false });
   hud.addEventListener('wheel', wheelVol, { passive:false });
 
-  // Long-press to mute/unmute
-  (() => {
-    let t=0, pressed=false;
-    const down = () => { pressed=true; t = setTimeout(()=>{ pressed=false; audio.muted = !audio.muted; btn.classList.toggle('is-muted', audio.muted); }, 550); };
-    const up   = () => { clearTimeout(t); if(pressed){ /* short click handled by default */ } pressed=false; };
+  // long-press mute/unmute
+  (()=> {
+    let t=0, pressed=false, prevVol=audio.volume;
+    const down = () => { pressed=true; t=setTimeout(()=>{ pressed=false; prevVol=audio.volume; audio.volume=0; vol.value='0'; rampTo(0,0.15); }, 520); };
+    const up = () => { clearTimeout(t); if(!pressed) return; /* short-click handled by click */ };
     btn.addEventListener('pointerdown', down);
     addEventListener('pointerup', up);
     addEventListener('pointercancel', up);
   })();
 
-  // Keyboard M toggle; ArrowUp/Down volume; ArrowLeft/Right seek 5s
+  // keyboard: M toggle, arrows seek/vol
   d.addEventListener('keydown', (e)=>{
-    if (e.metaKey||e.ctrlKey||e.altKey) return;
-    const k = e.key.toLowerCase();
-    if (k==='m'){ e.preventDefault(); audio.paused ? play() : pause(); }
-    if (k==='arrowup'){ e.preventDefault(); audio.volume = Math.min(1, audio.volume + .04); vol.value = String(audio.volume); }
-    if (k==='arrowdown'){ e.preventDefault(); audio.volume = Math.max(0, audio.volume - .04); vol.value = String(audio.volume); }
-    if (k==='arrowleft'){ e.preventDefault(); audio.currentTime = Math.max(0, audio.currentTime - 5); }
-    if (k==='arrowright'){ e.preventDefault(); audio.currentTime = Math.min(audio.duration||0, audio.currentTime + 5); }
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    const k=e.key.toLowerCase();
+    if(k==='m'){ e.preventDefault(); audio.paused ? play() : pause(); }
+    if(k==='arrowleft'){ e.preventDefault(); audio.currentTime = clamp(audio.currentTime-5, 0, audio.duration||0); }
+    if(k==='arrowright'){ e.preventDefault(); audio.currentTime = clamp(audio.currentTime+5, 0, audio.duration||0); }
+    if(k==='arrowup'){ e.preventDefault(); audio.volume = clamp(audio.volume+.04,0,1); vol.value=String(audio.volume); if(!audio.paused) rampTo(audio.volume,0.1); }
+    if(k==='arrowdown'){ e.preventDefault(); audio.volume = clamp(audio.volume-.04,0,1); vol.value=String(audio.volume); if(!audio.paused) rampTo(audio.volume,0.1); }
   });
 
-  // Seek bar
+  // Seek + Volume sliders
   seek.addEventListener('input', ()=>{
-    audio.currentTime = (audio.duration||0) * parseFloat(seek.value || '0');
-    setProgressRing(); updateTimeUI();
+    audio.currentTime = (audio.duration||0) * parseFloat(seek.value||'0');
+    setRing(); setTime();
   });
-
-  // Volume bar
   vol.addEventListener('input', ()=>{
-    audio.volume = Math.min(1, Math.max(0, parseFloat(vol.value || '0')));
-    try { localStorage.setItem(K_VOL, String(audio.volume)); } catch {}
+    audio.volume = clamp(parseFloat(vol.value||'0'),0,1);
+    try{ localStorage.setItem(K_VOL, String(audio.volume)); }catch{}
+    if(!audio.paused) rampTo(audio.volume, 0.1);
   });
 
-  // Audio event sync
-  audio.addEventListener('play',  ()=> setPlayUI(true));
-  audio.addEventListener('pause', ()=> setPlayUI(false));
-  audio.addEventListener('timeupdate', ()=> { setProgressRing(); updateTimeUI(); });
-  audio.addEventListener('durationchange', ()=> updateTimeUI());
-  audio.addEventListener('ended', ()=> { localStorage.setItem(K_PLAY,'0'); setPlayUI(false); ticker.stop(); });
+  // Audio events
+  audio.addEventListener('play',  ()=> setPlayingUI(true));
+  audio.addEventListener('pause', ()=> setPlayingUI(false));
+  audio.addEventListener('timeupdate', ()=> { setRing(); setTime(); });
+  audio.addEventListener('durationchange', ()=> setTime());
+  audio.addEventListener('ended', ()=> { localStorage.setItem(K_PLAY,'0'); setPlayingUI(false); ticker.stop(); rampTo(0,0.15); });
 
-  // Respect reduced motion for spinner
-  RM_MQ.addEventListener('change', ()=> setPlayUI(!audio.paused));
+  // Media Session (lock-screen / headset buttons)
+  if ('mediaSession' in navigator){
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: elTitle.textContent,
+      artist: 'Daniel',
+      album: 'Site BGM',
+      artwork: [{ src: 'images/Vynl.png', sizes: '512x512', type: 'image/png' }]
+    });
+    navigator.mediaSession.setActionHandler('play', play);
+    navigator.mediaSession.setActionHandler('pause', pause);
+    navigator.mediaSession.setActionHandler('seekbackward', ()=> audio.currentTime = clamp(audio.currentTime-10, 0, audio.duration||0));
+    navigator.mediaSession.setActionHandler('seekforward', ()=> audio.currentTime = clamp(audio.currentTime+10, 0, audio.duration||0));
+    navigator.mediaSession.setActionHandler('seekto', (d)=> { if (d.seekTime!=null) audio.currentTime = clamp(d.seekTime,0,audio.duration||0); });
+  }
 
-  // Ambient open/close HUD on proximity
-  const openHud = () => hud.classList.add('is-open');
-  const closeHudDelay = (()=>{ let t=0; return ()=>{ clearTimeout(t); t=setTimeout(()=> hud.matches(':hover')||btn.matches(':hover') ? openHud() : hud.classList.remove('is-open'), 500); }; })();
-  btn.addEventListener('pointerenter', openHud);
-  btn.addEventListener('pointerleave', closeHudDelay);
-  hud.addEventListener('pointerleave', closeHudDelay);
-
-  // Resume on first gesture if previously playing (autoplay policy)
+  // Resume on first gesture if it was playing previously (autoplay policy)
   const tryResume = () => {
     if (!resumePending) return;
-    resumePending = false; play();
+    resumePending=false; play();
     d.removeEventListener('pointerdown', tryResume);
     d.removeEventListener('keydown', tryResume);
   };
@@ -168,5 +186,5 @@
   d.addEventListener('keydown', tryResume);
 
   // Prime UI
-  setProgressRing(); updateTimeUI(); setPlayUI(localStorage.getItem(K_PLAY)==='1' && !audio.paused);
+  setRing(); setTime(); setPlayingUI(localStorage.getItem(K_PLAY)==='1' && !audio.paused);
 })();
